@@ -61,12 +61,15 @@ function Navbar() {
                 2
               </span>
             </button>
-            <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors relative">
-              <ShoppingBag size={20} />
-              <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
-                1
-              </span>
-            </button>
+
+            <Link to="/cart" className="hover:text-stone-900 transition-colors">
+              <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors relative">
+                <ShoppingBag size={20} />
+                <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
+                  1
+                </span>
+              </button>
+            </Link>
             <button className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors">
               <User size={20} />
             </button>

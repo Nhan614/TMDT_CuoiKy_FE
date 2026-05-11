@@ -7,6 +7,7 @@ import PublicLayout from "../components/layouts/publicLayout";
 import LoginPage from "../pages/public/LoginPage";
 import AboutPage from "../pages/public/AboutPage";
 import ProductsPage from "../pages/public/ProductsPage";
+import CartPage from "../pages/public/CartPage";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: "/about",
         element: <AboutPage />,
+      },
+      {
+        path: "/cart",
+        element: <CartPage />,
       },
     ],
   },
