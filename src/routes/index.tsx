@@ -7,7 +7,7 @@ import PublicLayout from "../components/layouts/publicLayout";
 
 export const router = createBrowserRouter([
   {
-    path: "/register ",
+    path: "/register",
     element: <Register />,
   },
   // --- PUBLIC ROUTES ---
