@@ -4,4 +4,15 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", serif;
+
+  --color-primary: #a23900;
+  --color-on-primary: #ffffff;
+  --color-secondary: #625e58;
+  --color-surface: #fbf9f9;
+  --color-on-surface: #1b1c1c;
+  --color-beige: #f2ebe3;
+  --color-neutral-border: #e5e5e5;
+  --color-surface-container-low: #f5f3f3;
+
+  --radius-standard: 0.5rem;
 }
