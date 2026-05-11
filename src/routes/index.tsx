@@ -6,6 +6,7 @@ import { DashboardPage } from "../pages/admin";
 import PublicLayout from "../components/layouts/publicLayout";
 import LoginPage from "../pages/public/LoginPage";
 import AboutPage from "../pages/public/AboutPage";
+import CartPage from "../pages/public/CartPage";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
       {
         path: "/about",
         element: <AboutPage />,
+      },
+      {
+        path: "/cart",
+        element: <CartPage />,
       },
     ],
   },
