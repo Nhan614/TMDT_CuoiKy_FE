@@ -6,6 +6,7 @@ import { DashboardPage } from "../pages/admin";
 import PublicLayout from "../components/layouts/publicLayout";
 import LoginPage from "../pages/public/LoginPage";
 import AboutPage from "../pages/public/AboutPage";
+import ProductDetail from "../pages/public/ProductDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,11 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+
+   {
+    path: "/productDetail",
+    element: <ProductDetail />,
   },
   // --- PUBLIC ROUTES ---
   {

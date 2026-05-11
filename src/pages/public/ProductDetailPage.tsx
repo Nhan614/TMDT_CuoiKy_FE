@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  ShoppingBag, 
-  User, 
-  Menu, 
+import {  
   Star, 
   Minus, 
   Plus, 
@@ -16,6 +13,8 @@ import {
   ChevronRight,
   Heart
 } from "lucide-react";
+import Navbar from "../../components/common/Navbar";
+import Footer from "../../components/common/Footer";
 
 
 interface ProductCardProps {
@@ -76,7 +75,7 @@ function ReviewCard({ name, title, content, avatar }: ReviewCardProps) {
   );
 }
 
-export default function App() {
+export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuDm_vrbMEx5CgF1oUHuQuf5GDkhlQ8OBFOfflMn8TgrBy28gLuaMFnnOU4RClBB8jTMU2Npwu9vb5tiH73PTpj_dgH_kAyRDQ64reU_UuthozyXQjxuoxb6hz2QdpfQLyjDQTurzXVQyf8dWf6_nEgSNhYoH3uTosDe4GD08N4My2NqYN5tQcjctdWkL4igZ5lc9TxIjwTRq38ylpA7l-YlBwqvb6GOpxsXyhxaTWyyqcqMCxJp8GyXbxe90bxi0vIpMfXJfpyMW3o");
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
@@ -91,35 +90,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="text-3xl font-bold text-primary tracking-tight">Len & Sợi</div>
-          <div className="hidden md:flex items-center gap-10">
-            {["Cửa hàng", "Bộ sưu tập", "Về chúng tôi", "Liên hệ"].map((item, idx) => (
-              <a 
-                key={item} 
-                href="#" 
-                className={`text-body-md font-medium transition-colors hover:text-primary ${idx === 0 ? "text-primary border-b-2 border-primary pb-1" : "text-secondary"}`}
-              >
-                {item}
-              </a>
-            ))}
-          </div>
-          <div className="flex items-center gap-6">
-            <button className="p-2 text-primary hover:bg-surface-container rounded-full transition-colors relative">
-              <ShoppingBag className="w-6 h-6" />
-              <span className="absolute top-0 right-0 w-4 h-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full">2</span>
-            </button>
-            <button className="p-2 text-primary hover:bg-surface-container rounded-full transition-colors">
-              <User className="w-6 h-6" />
-            </button>
-            <button className="md:hidden p-2 text-primary">
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </nav>
+        <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         {/* Breadcrumbs */}
@@ -351,6 +322,8 @@ export default function App() {
           </div>
         </section>
       </main>
+    <Footer />
+      
     </div>
   );
 }
