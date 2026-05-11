@@ -40,6 +40,9 @@ function Navbar() {
             >
               Về chúng tôi
             </Link>
+            <a href="/artisan" className="hover:text-stone-900 transition-colors">
+              Đặt hàng riêng
+            </a>
             <a href="#" className="hover:text-stone-900 transition-colors">
               Liên Hệ
             </a>

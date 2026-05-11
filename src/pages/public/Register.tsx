@@ -121,7 +121,7 @@ export default function RegistrationCard() {
             <motion.button 
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full h-12 bg-brand-purple text-white font-semibold rounded-xl shadow-lg shadow-brand-purple/20 hover:bg-brand-purple-hover transition-all mt-4"
+              className="w-full h-12 bg-brand-purple text-black font-semibold rounded-xl shadow-lg shadow-brand-purple/20 hover:bg-brand-purple-hover transition-all mt-4"
             >
               Đăng ký
             </motion.button>
