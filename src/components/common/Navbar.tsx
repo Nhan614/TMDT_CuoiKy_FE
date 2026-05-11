@@ -28,9 +28,15 @@ function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-stone-600 uppercase tracking-wider">
-            <a href="#" className="hover:text-stone-900 transition-colors">
-              Cửa Hàng
-            </a>
+            <Link to="/home" className="hover:text-stone-900 transition-colors">
+              Trang chủ
+            </Link>
+            <Link
+              to="/products"
+              className="hover:text-stone-900 transition-colors"
+            >
+              Sản phẩm
+            </Link>
             <a href="#" className="hover:text-stone-900 transition-colors">
               Bộ Sưu Tập
             </a>
