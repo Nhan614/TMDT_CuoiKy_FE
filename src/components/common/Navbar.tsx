@@ -1,6 +1,7 @@
 import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,9 +34,12 @@ function Navbar() {
             <a href="#" className="hover:text-stone-900 transition-colors">
               Bộ Sưu Tập
             </a>
-            <a href="#" className="hover:text-stone-900 transition-colors">
-              Về Chúng Tôi
-            </a>
+            <Link
+              to="/about"
+              className="hover:text-stone-900 transition-colors"
+            >
+              Về chúng tôi
+            </Link>
             <a href="#" className="hover:text-stone-900 transition-colors">
               Liên Hệ
             </a>

@@ -4,11 +4,18 @@ import { HomePage } from "../pages/public";
 import Register from "../pages/public/Register";
 import { DashboardPage } from "../pages/admin";
 import PublicLayout from "../components/layouts/publicLayout";
+import LoginPage from "../pages/public/LoginPage";
+import AboutPage from "../pages/public/AboutPage";
 
 export const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+
+  {
+    path: "/login",
+    element: <LoginPage />,
   },
   // --- PUBLIC ROUTES ---
   {
@@ -22,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: "/home",
         element: <HomePage />,
+      },
+      {
+        path: "/about",
+        element: <AboutPage />,
       },
     ],
   },
