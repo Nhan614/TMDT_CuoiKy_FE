@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Heart, User, ArrowRight } from "lucide-react";
-import Navbar from "../../components/common/Navbar";
+import Navbar from "../../components/common/Header";
 import ProductCard from "../../components/common/ProductCard";
 import CategoryCircle from "../../components/common/CategoryCircle";
 

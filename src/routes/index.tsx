@@ -1,10 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import { HomePage } from "../pages/public";
-import Register from "../pages/public/Register";
+import { HomePage, LoginPage, RegisterPage } from "../pages/public";
 import { DashboardPage } from "../pages/admin";
 import PublicLayout from "../components/layouts/publicLayout";
-import LoginPage from "../pages/public/LoginPage";
 import AboutPage from "../pages/public/AboutPage";
 import ArtisanPage from "../pages/public/ArtisanPage";
 import ProductsPage from "../pages/public/ProductsPage";
@@ -14,7 +12,7 @@ import ProductDetail from "../pages/public/ProductDetailPage";
 export const router = createBrowserRouter([
   {
     path: "/register",
-    element: <Register />,
+    element: <RegisterPage />,
   },
 
   {
@@ -22,7 +20,7 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
 
-   {
+  {
     path: "/productDetail",
     element: <ProductDetail />,
   },
