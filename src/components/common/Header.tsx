@@ -1,10 +1,33 @@
-import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import {
+  Heart,
+  LogOut,
+  Menu,
+  Search,
+  ShoppingBag,
+  User,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { logout } from "../../features/auth/authSlice";
 
-function Navbar() {
+function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const { user } = useAppSelector((state) => state.auth);
+
+  // Kiểm tra đăng nhập: Có user trong Store HOẶC có token trong LocalStorage
+  const isLoggedIn = !!user || !!localStorage.getItem("token");
+
+  const handleLogout = () => {
+    dispatch(logout()); // Gọi logout từ authSlice để xóa user và token
+    navigate("/login");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
@@ -46,7 +69,10 @@ function Navbar() {
             >
               Về chúng tôi
             </Link>
-            <a href="/artisan" className="hover:text-stone-900 transition-colors">
+            <a
+              href="/artisan"
+              className="hover:text-stone-900 transition-colors"
+            >
               Đặt hàng riêng
             </a>
             <a href="#" className="hover:text-stone-900 transition-colors">
@@ -73,9 +99,31 @@ function Navbar() {
                 </span>
               </button>
             </Link>
-            <button className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors">
+
+            {/* <Link
+              to="/login"
+              className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+            >
               <User size={20} />
-            </button>
+            </Link> */}
+            {/* Xử lý hiển thị User hoặc Logout dựa trên trạng thái đăng nhập */}
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+                title="Đăng xuất"
+              >
+                <LogOut size={20} />
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+                title="Đăng nhập"
+              >
+                <User size={20} />
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -105,4 +153,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default Header;

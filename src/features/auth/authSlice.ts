@@ -17,6 +17,10 @@ export const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.isLoading = false;
+      state.error = null;
+      state.successMessage = null;
+      // Xóa luôn ở localStorage để đồng bộ
       localStorage.removeItem("token");
     },
     clearMessages: (state) => {
