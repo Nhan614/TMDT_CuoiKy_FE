@@ -9,6 +9,7 @@ import AboutPage from "../pages/public/AboutPage";
 import ArtisanPage from "../pages/public/ArtisanPage";
 import ProductsPage from "../pages/public/ProductsPage";
 import CartPage from "../pages/public/CartPage";
+import ProductDetail from "../pages/public/ProductDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,11 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+
+   {
+    path: "/productDetail",
+    element: <ProductDetail />,
   },
   // --- PUBLIC ROUTES ---
   {

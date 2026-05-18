@@ -23,7 +23,7 @@ export default function RegistrationCard() {
             className="w-full h-full rounded-[30px] overflow-hidden shadow-sm"
           >
             <img 
-              src="https://images.unsplash.com/photo-1629739688320-7f2827e8d085?q=80&w=2670&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=2070&auto=format&fit=crop" 
               alt="Handmade Wool Craft" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
