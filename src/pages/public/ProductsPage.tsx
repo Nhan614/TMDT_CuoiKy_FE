@@ -108,9 +108,7 @@ function ProductsPage() {
                       : String(product.price),
                   rating: product.rating ?? 5.0,
                   image:
-                    product.imageUrl ||
-                    product.image ||
-                    "https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=2070&auto=format&fit=crop",
+                    product.thumbnailUrl
                 };
 
                 return <ProductCard key={product.id} {...mappedProduct} onAddToCart={handleAddToCart} />;
