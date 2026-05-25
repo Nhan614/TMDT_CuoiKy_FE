@@ -8,10 +8,11 @@ import {
   X,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../../features/auth/authSlice";
+import { fetchCart } from "../../features/cart/cartThunk";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,9 +21,16 @@ function Header() {
   const navigate = useNavigate();
 
   const { user } = useAppSelector((state) => state.auth);
+  const { cart } = useAppSelector((state) => state.cart);
 
   // Kiểm tra đăng nhập: Có user trong Store HOẶC có token trong LocalStorage
   const isLoggedIn = !!user || !!localStorage.getItem("token");
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, isLoggedIn]);
 
   const handleLogout = () => {
     dispatch(logout()); // Gọi logout từ authSlice để xóa user và token
@@ -94,9 +102,11 @@ function Header() {
             <Link to="/cart" className="hover:text-stone-900 transition-colors">
               <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors relative">
                 <ShoppingBag size={20} />
-                <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
-                  1
-                </span>
+                {cart && cart.totalItems > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
+                    {cart.totalItems}
+                  </span>
+                )}
               </button>
             </Link>
 
