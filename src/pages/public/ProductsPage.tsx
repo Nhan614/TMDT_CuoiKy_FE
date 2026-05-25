@@ -102,9 +102,7 @@ function ProductsPage() {
                       : String(product.price),
                   rating: product.rating ?? 5.0,
                   image:
-                    product.imageUrl ||
-                    product.image ||
-                    "https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=2070&auto=format&fit=crop",
+                    product.thumbnailUrl
                 };
 
                 return <ProductCard key={product.id} {...mappedProduct} />;
@@ -129,11 +127,10 @@ function ProductsPage() {
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${
-                      filters.page === pageNum
-                        ? "bg-primary text-white"
-                        : "border border-neutral-border hover:border-primary hover:text-primary"
-                    }`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${filters.page === pageNum
+                      ? "bg-primary text-white"
+                      : "border border-neutral-border hover:border-primary hover:text-primary"
+                      }`}
                   >
                     {pageNum}
                   </button>

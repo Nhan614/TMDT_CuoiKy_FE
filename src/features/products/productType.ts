@@ -5,7 +5,7 @@ export interface ProductResponseDTO {
   price: number | string;
   rating?: number;
   image?: string;
-  imageUrl?: string;
+  thumbnailUrl?: string;
   isActive?: boolean;
   categoryId?: number;
   description?: string;
