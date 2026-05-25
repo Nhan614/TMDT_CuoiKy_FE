@@ -105,7 +105,7 @@ function HomePage() {
           <div className="relative rounded-4xl overflow-hidden bg-stone-200 min-h-125 sm:min-h-150 flex items-center shadow-md">
             <div className="absolute inset-0 z-0">
               <img
-                src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=2000"
+                src="https://i.pinimg.com/1200x/3c/63/0f/3c630f3e06b34fc2eefbeb90a660a57b.jpg"
                 alt="Len & Sợi Hero"
                 className="w-full h-full object-cover opacity-80"
                 referrerPolicy="no-referrer"
@@ -129,7 +129,7 @@ function HomePage() {
                 Khám phá bộ sưu tập đan móc thủ công, mang đến sự ấm áp và phong
                 cách độc đáo cho bạn và tổ ấm.
               </p>
-              <button className="bg-stone-800 text-white px-8 py-4 rounded-full font-bold hover:bg-stone-700 transition-all flex items-center gap-2 group shadow-lg">
+              <button className="bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary/80 transition-all flex items-center gap-2 group shadow-lg cursor-pointer">
                 Khám Phá Ngay
                 <ArrowRight
                   size={20}
