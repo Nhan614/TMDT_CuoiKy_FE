@@ -8,6 +8,7 @@ import ArtisanPage from "../pages/public/ArtisanPage";
 import ProductsPage from "../pages/public/ProductsPage";
 import CartPage from "../pages/public/CartPage";
 import ProductDetail from "../pages/public/ProductDetailPage";
+import ArtisanDetail from "../pages/public/ArtisanDetail";
 
 export const router = createBrowserRouter([
   {
@@ -46,8 +47,12 @@ export const router = createBrowserRouter([
         element: <AboutPage />,
       },
       {
-        path: "/artisan",
+        path: "/artisan", // 
         element: <ArtisanPage />,
+      },
+      {
+        path: "/artisans/:id", //
+        element: <ArtisanDetail />,
       },
       {
         path: "/cart",

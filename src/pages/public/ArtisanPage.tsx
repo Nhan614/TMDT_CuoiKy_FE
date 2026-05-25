@@ -1,22 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Star, ArrowRight, Sparkles, PenTool, Clock, CheckCircle2, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Star, ArrowRight, Sparkles, PenTool, Clock, CheckCircle2, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from "motion/react";
-
-// Định nghĩa base URL của API khớp với Spring Boot
-const API_BASE_URL = 'http://localhost:8080/api/artisans';
-
-// Định nghĩa kiểu dữ liệu đồng bộ với ArtisanCardResponse từ Back-End
-interface Artisan {
-  id: number;
-  name: string;
-  tag: string;      
-  image: string;
-  rating: number;
-  quote: string;
-  experience: string;
-  orders: string;      
-  featured?: boolean;
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import type { RootState, AppDispatch } from '../../app/store';
+import { fetchArtisans, setSkill, setSortBy, setCurrentPage, type Artisan, createArtisanOrder } from '../../features/artisans/artisansSlice';
 
 const benefits = [
   { icon: <Sparkles className="w-6 h-6" />, title: 'Chất liệu tuyển chọn', description: 'Tùy chọn loại sợi và màu sắc theo sở thích cá nhân.' },
@@ -25,19 +13,20 @@ const benefits = [
   { icon: <CheckCircle2 className="w-6 h-6" />, title: 'Cam kết chất lượng', description: 'Hoàn thiện đến khi bạn thực sự hài lòng với tác phẩm.' }
 ];
 
-// Định nghĩa Interface Props cho Component Card để tránh lỗi "any"
 interface ArtisanCardProps {
   artisan: Artisan;
   index: number;
-  onSelect: (id: number) => Promise<void>;
+  onOrder: (id: number) => Promise<void>;
 }
 
-function ArtisanCard({ artisan, index, onSelect }: ArtisanCardProps) {
+function ArtisanCard({ artisan, index, onOrder }: ArtisanCardProps) {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSelect = async () => {
+  const handleOrder = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setLoading(true);
-    await onSelect(artisan.id);
+    await onOrder(artisan.id);
     setLoading(false);
   };
 
@@ -47,7 +36,8 @@ function ArtisanCard({ artisan, index, onSelect }: ArtisanCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       viewport={{ once: true }}
-      className={`group bg-surface rounded-card border shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden flex flex-col ${artisan.featured ? 'border-primary/20 scale-[1.02]' : 'border-black/5'}`}
+      onClick={() => navigate(`/artisans/${artisan.id}`)}
+      className={`group bg-surface rounded-card border shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer ${artisan.featured ? 'border-primary/20 scale-[1.02]' : 'border-black/5'}`}
     >
       <div className="relative aspect-[4/5] overflow-hidden">
         <img 
@@ -74,15 +64,15 @@ function ArtisanCard({ artisan, index, onSelect }: ArtisanCardProps) {
         <div className="grid grid-cols-2 gap-4 py-4 border-y border-black/5 mb-8">
           <div>
             <p className="text-[10px] text-secondary uppercase tracking-widest mb-1 font-semibold">Kinh nghiệm</p>
-            <p className="font-bold text-[#1b1c1c] text-lg">{artisan.experience}</p>
+            <p className="font-bold text-[#1b1c1c] text-lg">{artisan.experience || 'N/A'}</p>
           </div>
           <div>
             <p className="text-[10px] text-secondary uppercase tracking-widest mb-1 font-semibold">Đã hoàn thành</p>
-            <p className="font-bold text-[#1b1c1c] text-lg">{artisan.orders}</p>
+            <p className="font-bold text-[#1b1c1c] text-lg">{artisan.orders || 0}</p>
           </div>
         </div>
         <button 
-          onClick={handleSelect}
+          onClick={handleOrder}
           disabled={loading}
           className="mt-auto w-full group/btn relative flex items-center justify-center gap-2 bg-primary text-white font-bold py-4 rounded-button overflow-hidden transition-all hover:bg-primary/90 disabled:bg-primary/50"
         >
@@ -100,57 +90,38 @@ function ArtisanCard({ artisan, index, onSelect }: ArtisanCardProps) {
   );
 }
 
-export default function App() {
-  const [artisansList, setArtisansList] = useState<Artisan[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [selectedSkill, setSelectedSkill] = useState<string>('ALL'); 
-  const [sortBy, setSortBy] = useState<string>('rating'); 
+export default function ArtisanPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  
+  const { pageData, loading, selectedSkill, sortBy, currentPage } = useSelector(
+    (state: RootState) => state.artisans
+  );
 
-  const fetchArtisans = async () => {
-    setLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      if (selectedSkill !== 'ALL') {
-        queryParams.append('skill', selectedSkill);
-      }
-      queryParams.append('sortBy', sortBy);
+  // 🛡️ TẦNG PHÒNG THỦ KHỚP DỮ LIỆU: Bóc tách mảng từ "data" bọc trong ApiResponse 
+  const artisansList = (() => {
+    if (!pageData) return [];
+    // 1. Trường hợp Slice gán thẳng mảng từ action.payload.data vào pageData
+    if (Array.isArray(pageData)) return pageData;
+    // 2. Trường hợp Slice giữ nguyên cấu trúc phản hồi { data: [...] }
+    if (Array.isArray((pageData as any).data)) return (pageData as any).data;
+    // 3. Trường hợp cấu trúc chuẩn Spring Boot Page { content: [...] }
+    if (pageData.content && Array.isArray(pageData.content)) return pageData.content;
+    return [];
+  })();
 
-      const response = await fetch(`${API_BASE_URL}?${queryParams.toString()}`);
-      if (response.ok) {
-        const data = await response.json();
-        setArtisansList(data);
-      } else {
-        console.error("Lỗi khi tải dữ liệu từ server");
-      }
-    } catch (error) {
-      console.error("Lỗi kết nối API:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 🛡️ BÓC TÁCH SỐ TRANG: Quét từ thuộc tính "meta" của Back-End
+  const totalPages = pageData?.totalPages || (pageData as any)?.meta?.totalPages || 0;
 
   useEffect(() => {
-    fetchArtisans();
-  }, [selectedSkill, sortBy]);
+    dispatch(fetchArtisans());
+  }, [dispatch, selectedSkill, sortBy, currentPage]);
 
   const handleCreateOrder = async (id: number) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/${id}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      const message = await response.text();
-      
-      if (response.ok) {
-        alert(`🎉 Thành công: ${message}`);
-      } else {
-        alert(`⚠️ Thất bại: ${message}`);
-      }
-    } catch (error) {
-      alert("❌ Lỗi kết nối mạng, vui lòng thử lại sau!");
+    const result = await dispatch(createArtisanOrder(id));
+    if (createArtisanOrder.fulfilled.match(result)) {
+      alert(`🎉 Thành công: ${result.payload}`);
+    } else {
+      alert(`⚠️ Thất bại: ${result.payload}`);
     }
   };
 
@@ -174,21 +145,20 @@ export default function App() {
             <span className="text-xs font-bold text-secondary uppercase tracking-widest">Lọc theo kỹ năng:</span>
             <div className="flex flex-wrap gap-2">
               <button 
-                onClick={() => setSelectedSkill('ALL')}
+                onClick={() => dispatch(setSkill('ALL'))}
                 className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${selectedSkill === 'ALL' ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-black/5 text-[#594138] hover:bg-black/10'}`}
               >
                 Tất cả
               </button>
               
-              {/* Danh sách Kỹ năng đã chuẩn hóa khớp với Enum Back-End */}
               {[
                 { label: 'Amigurumi', value: 'AMIGURUMI' },
                 { label: 'Đan móc', value: 'DAN_MOC' },
                 { label: 'Thêu tay', value: 'THEU_TAY' }
-              ].map((skill: { label: string, value: string }) => (
+              ].map((skill) => (
                 <button 
                   key={skill.value} 
-                  onClick={() => setSelectedSkill(skill.value)}
+                  onClick={() => dispatch(setSkill(skill.value))}
                   className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${selectedSkill === skill.value ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-black/5 text-[#594138] hover:bg-black/10'}`}
                 >
                   {skill.label}
@@ -196,12 +166,11 @@ export default function App() {
               ))}
             </div>
             
-            {/* Bộ chọn Sắp Xếp */}
             <div className="ml-auto flex items-center gap-3">
               <span className="text-xs font-bold text-secondary">Sắp xếp:</span>
               <select 
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => dispatch(setSortBy(e.target.value))}
                 className="bg-transparent border-none text-xs font-bold text-primary focus:ring-0 cursor-pointer appearance-none pr-8 relative outline-none"
               >
                 <option value="rating">Đánh giá tốt nhất</option>
@@ -213,30 +182,60 @@ export default function App() {
         </section>
 
         {/* Artisan Grid */}
-        <section className="max-container mb-32">
+        <section className="max-container mb-16">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <Loader2 className="w-10 h-10 animate-spin text-primary" />
               <p className="text-secondary text-sm">Đang tải danh sách nghệ nhân...</p>
             </div>
-          ) : artisansList.length === 0 ? (
-            <div className="text-center py-20 text-secondary">
+          ) : artisansList.length === 0 ? ( 
+            <div className="text-center py-20 text-secondary border border-dashed border-black/10 rounded-xl">
               Không tìm thấy nghệ nhân nào phù hợp với bộ lọc.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Định nghĩa kiểu dữ liệu tường minh (artisan: Artisan, index: number) loại bỏ hoàn toàn lỗi ngầm định any */}
               {artisansList.map((artisan: Artisan, index: number) => (
                 <ArtisanCard 
                   key={artisan.id} 
                   artisan={artisan} 
                   index={index} 
-                  onSelect={handleCreateOrder} 
+                  onOrder={handleCreateOrder} 
                 />
               ))}
             </div>
           )}
         </section>
+
+        {/* Pagination Section */}
+        {totalPages > 1 && ( 
+          <section className="flex items-center justify-center gap-2 mb-32">
+            <button
+              onClick={() => dispatch(setCurrentPage(Math.max(currentPage - 1, 0)))}
+              disabled={currentPage === 0}
+              className="p-3 rounded-xl border border-black/5 bg-[#f5f3f3] hover:bg-black/10 disabled:opacity-40 disabled:hover:bg-[#f5f3f3] transition-all"
+            >
+              <ChevronLeft className="w-4 h-4 text-[#1b1c1c]" />
+            </button>
+
+            {Array.from({ length: totalPages }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => dispatch(setCurrentPage(idx))}
+                className={`w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === idx ? 'bg-primary text-white shadow-md shadow-primary/20' : 'border border-black/5 hover:bg-black/5 text-[#594138]'}`}
+              >
+                {idx + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => dispatch(setCurrentPage(Math.min(currentPage + 1, totalPages - 1)))}
+              disabled={currentPage === totalPages - 1}
+              className="p-3 rounded-xl border border-black/5 bg-[#f5f3f3] hover:bg-black/10 disabled:opacity-40 disabled:hover:bg-[#f5f3f3] transition-all"
+            >
+              <ChevronRight className="w-4 h-4 text-[#1b1c1c]" />
+            </button>
+          </section>
+        )}
 
         {/* Benefits Section */}
         <section className="bg-accent py-32 overflow-hidden -mx-6 md:-mx-12 lg:-mx-16">
