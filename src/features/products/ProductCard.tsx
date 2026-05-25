@@ -1,5 +1,6 @@
 import { Star, Heart } from "lucide-react";
 import { motion } from "motion/react";
+import type { AddToCartRequest } from "../cart/cartType";
 
 interface ProductProps {
   id: number;
@@ -7,13 +8,16 @@ interface ProductProps {
   price: string;
   rating: number;
   image: string;
+  onAddToCart: (addToCartRequest: AddToCartRequest) => void;
 }
 
 export default function ProductCard({
+  id,
   title,
   price,
   rating,
   image,
+  onAddToCart,
 }: ProductProps) {
   return (
     <motion.div
@@ -35,7 +39,9 @@ export default function ProductCard({
         </button>
 
         <div className="absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button className="w-full bg-primary text-white py-3 rounded-lg font-bold shadow-lg transform active:scale-95 transition-all">
+          <button
+            onClick={() => onAddToCart({ productId: id, quantity: 1 })}
+            className="w-full bg-primary text-white py-3 rounded-lg font-bold shadow-lg transform active:scale-95 transition-all cursor-pointer">
             Thêm vào giỏ
           </button>
         </div>

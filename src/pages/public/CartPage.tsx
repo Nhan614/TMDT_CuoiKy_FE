@@ -103,10 +103,10 @@ export default function CartPage() {
   const totalPrice = cart?.totalPrice ?? 0;
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="pt-10 min-h-screen flex flex-col font-sans">
       <main className="flex-grow max-w-(--spacing-container-max) mx-auto px-6 py-10 md:py-16 w-full">
         <header className="mb-8 md:mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-3xl md:text-5xl font-bold text-on-background">
+          <h1 className="text-3xl font-bold text-on-background">
             Giỏ hàng của bạn
           </h1>
           {items.length > 0 && (
@@ -184,7 +184,7 @@ export default function CartPage() {
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.currentTarget as HTMLImageElement).src =
-                                "https://placehold.co/200x240?text=No+Image";
+                                "https://i.pinimg.com/736x/cb/fe/1a/cbfe1ae789e4b7b3b28c6f8e1558425a.jpg";
                             }}
                           />
                         </div>

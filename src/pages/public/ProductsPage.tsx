@@ -5,6 +5,8 @@ import Sidebar from "../../features/products/Sidebar";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchProducts } from "../../features/products/productThunk";
 import { setFilters, setPage } from "../../features/products/productSlice";
+import type { AddToCartRequest } from '../../features/cart/cartType';
+import { addToCart } from "../../features/cart/cartThunk";
 
 function ProductsPage() {
   const dispatch = useAppDispatch();
@@ -26,6 +28,10 @@ function ProductsPage() {
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     dispatch(setFilters({ sortBy: e.target.value, page: 1 }));
   };
+
+  const handleAddToCart = (addToCartRequest: AddToCartRequest) => {
+    dispatch(addToCart(addToCartRequest));
+  }
 
   return (
     <main className="grow max-w-300 mx-auto mt-15 px-4 md:px-6 py-8 md:py-16 w-full">
@@ -107,7 +113,7 @@ function ProductsPage() {
                     "https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=2070&auto=format&fit=crop",
                 };
 
-                return <ProductCard key={product.id} {...mappedProduct} />;
+                return <ProductCard key={product.id} {...mappedProduct} onAddToCart={handleAddToCart} />;
               })}
             </div>
           )}
@@ -129,11 +135,10 @@ function ProductsPage() {
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${
-                      filters.page === pageNum
-                        ? "bg-primary text-white"
-                        : "border border-neutral-border hover:border-primary hover:text-primary"
-                    }`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${filters.page === pageNum
+                      ? "bg-primary text-white"
+                      : "border border-neutral-border hover:border-primary hover:text-primary"
+                      }`}
                   >
                     {pageNum}
                   </button>

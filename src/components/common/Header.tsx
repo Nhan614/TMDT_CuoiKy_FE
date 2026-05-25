@@ -1,8 +1,6 @@
 import {
-  Heart,
   LogOut,
   Menu,
-  Search,
   ShoppingBag,
   User,
   X,
@@ -33,7 +31,7 @@ function Header() {
   }, [dispatch, isLoggedIn]);
 
   const handleLogout = () => {
-    dispatch(logout()); // Gọi logout từ authSlice để xóa user và token
+    dispatch(logout());
     navigate("/login");
   };
 
@@ -49,11 +47,11 @@ function Header() {
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <div className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center text-white font-serif font-bold">
-                L
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-serif font-bold">
+                A
               </div>
-              <span className="text-xl font-serif font-bold tracking-tight text-stone-800 uppercase">
-                Len & Sợi
+              <span className="text-xl  font-bold tracking-tight text-primary uppercase">
+                Atelier
               </span>
             </div>
           </div>
@@ -89,16 +87,6 @@ function Header() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors">
-              <Search size={20} />
-            </button>
-            <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors relative">
-              <Heart size={20} />
-              <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
-                2
-              </span>
-            </button>
-
             <Link to="/cart" className="hover:text-stone-900 transition-colors">
               <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors relative">
                 <ShoppingBag size={20} />
@@ -110,12 +98,6 @@ function Header() {
               </button>
             </Link>
 
-            {/* <Link
-              to="/login"
-              className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
-            >
-              <User size={20} />
-            </Link> */}
             {/* Xử lý hiển thị User hoặc Logout dựa trên trạng thái đăng nhập */}
             {isLoggedIn ? (
               <button
