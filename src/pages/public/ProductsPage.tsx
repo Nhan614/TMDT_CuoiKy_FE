@@ -1,59 +1,32 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect } from "react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import ProductCard from "../../features/products/ProductCard";
 import Sidebar from "../../features/products/Sidebar";
-
-const PRODUCTS = [
-  {
-    id: 1,
-    title: "Áo Len Crochet Họa Tiết Hoa",
-    price: "1.250.000",
-    rating: 4.8,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDy3vtNPhfYDJ5UdLHXy6R7fX-K1Z15a63PoN4gn7RzPQUFmDBBtB0deZ3C7Ml3igDRbA0gYIveat5P76MA2J1VihoTnGiESXBWybTZWHn_f-IJWpudgQRa17ZwuD-dIog6-DsqG34M7HSW-l9We-xwzWBvglcSOFHtn8VpwBU3jfjeSuRhAkj164tT47v93KwwPqJ60n6ub6_8S46068kYEodOazLYEj95d_CLwKOtSjyBb1TYSinHwLiKwRvFJ_vsbjCzppht_Rk",
-  },
-  {
-    id: 2,
-    title: "Túi Xách Len Thủ Công",
-    price: "850.000",
-    rating: 5.0,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDW70S7XyijZr3gchgeO9ceCcTyCBe9CtqZFrABbOytfUg9cotFGkDNlXfs80-wGceC1PLq2OE_6ssJT7DIqfouENc9GuRI6SCmhdUPHB4xsKRfVh6BcOwDFSB9ed5ccm_MDLSzLxoaSSS9Jm-kxMwkrx8d7HED-NtpVfrkMtPIiF76VILoE8JVXJaUIi2uG_U5ybYjXIqM5TsfErg1bW31EWhIH3IFGKsMlx48LL-L6RpIO3V3gKC4Tl-e8OgaqmKQH2fklEw1ehk",
-  },
-  {
-    id: 3,
-    title: "Thú Bông Amigurumi",
-    price: "420.000",
-    rating: 4.9,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDBW8TXZ0bbrajDur25bBdQyazvpi0I9vAHLNVIogJyAOTyMbkgVT7pwXTmrYLode-tpG7u6zvSBq0sfrZVsuYRlIozoIVuZNT7lOToORvcMeRwtrsU_sLvcpZ400U9Rgr3xfycgkRdoyTWm1-Z4Seq3ON0pqApeC0LWzeluzmeRLb01gtMOguLs-djoAIRWZOxHa5NmZTA7dDM4tWQ_fqzGI9Pb-7n-DF3h35SuaPnRGWd9hNrSPCMutoBA38kft3ZapXT1hUkTPw",
-  },
-  {
-    id: 4,
-    title: "Khăn Trải Bàn Crochet",
-    price: "560.000",
-    rating: 4.7,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCzIzUpdv2FzJS4VsS9U57eNkPFRqXCnazpKGU1JDAuWT6G1RABuFGoLDxemsuYZwAIwF1BZ0EM5RTi318uTO3Kob5WNGMJYjXYvgGXcV_qky2V0V7xoWYjyKkiTnrl2cgWQ9U18HzmKZOFxl7Wa-S8tFpZGtB2C3qwZhVDcXuE-X2r1J8AoJTKeDnmmzF_WJULRswItJvQxrduHuOJVbH91mw7jo_y3yadXyZ63CRabt8bUrJEJ_6sdW6ClnTYMg0ppeqV63lGJgE",
-  },
-  {
-    id: 5,
-    title: "Khăn Choàng Merino",
-    price: "1.500.000",
-    rating: 5.0,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBUxlF127mXwASbyrD9jHxx-wXzYZ_nG_wrU2YKY04KlbIS7oLXDkRcpd_nAY58C7oO8tKd7oChPuUtSuYJLu75YnrX8gjnS-WAbwBmvq1HL4sVexEGtiihdQzx4vMgYMwbtBmQ_vq4yM7RTEOAxH6ueai-Vi7KmQ_lvKBJxS9cYChSoX0jPyTXyXYMf6hXEjaJ5zW3z-aEP_hZMKjolvYPyEXbeE0eoPifBfNzTIvlpN0qFG7nOzgzdcG3hscDEgsI5hj4rk8HCDc",
-  },
-  {
-    id: 6,
-    title: "Mũ Beanie Len Velvet",
-    price: "290.000",
-    rating: 4.6,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA1V9L5jOE0zPZXoy6dZsC3O53fE-W0WCoKyT-5bn0zYeqex9s0IpJSmQNsmUoBo8t1ru7M3dLm4dBMVaTmGmzu3_wLs8xXiQYQ7HC-CxVlNDUxIj0LmCjhX4VaaqdvK7MhKLkYVqIL3D2uljSb0tp2k8lBJL4UX-EdxgVyzwrL59un5Ps3CcNSHYrpARrKbfcXG__5QPtc_hztHAw4b3JiLKk5XPAhAhzoYhfpORf7OXInkxpVSiVswwZoWSGPpyGkplthjkCauiQ",
-  },
-];
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { fetchProducts } from "../../features/products/productThunk";
+import { setFilters, setPage } from "../../features/products/productSlice";
 
 function ProductsPage() {
+  const dispatch = useAppDispatch();
+  const { products, totalPages, totalElements, isLoading, error, filters } =
+    useAppSelector((state) => state.product);
+
+  // Fetch products whenever filters change
+  useEffect(() => {
+    dispatch(fetchProducts(filters));
+  }, [dispatch, filters]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      dispatch(setPage(newPage));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    dispatch(setFilters({ sortBy: e.target.value, page: 1 }));
+  };
+
   return (
     <main className="grow max-w-300 mx-auto mt-15 px-4 md:px-6 py-8 md:py-16 w-full">
       <div className="flex flex-col lg:flex-row gap-12">
@@ -62,53 +35,120 @@ function ProductsPage() {
 
         {/* Product Feed */}
         <section className="grow">
+          {/* Controls Bar */}
           <div className="flex flex-col sm:flex-row justify-between items-baseline mb-8 pb-4 border-b border-neutral-border gap-4">
             <p className="text-secondary font-medium">
-              Hiển thị 12 trên 63 sản phẩm
+              {isLoading ? (
+                <span>Đang tải sản phẩm...</span>
+              ) : (
+                <span>
+                  Hiển thị {products.length} trên {totalElements} sản phẩm
+                </span>
+              )}
             </p>
 
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">
                 Sắp xếp theo:
               </span>
-              <select className="bg-transparent border-none text-on-surface font-bold focus:ring-0 cursor-pointer outline-none text-sm">
-                <option>Mới nhất</option>
-                <option>Giá: Thấp đến Cao</option>
-                <option>Giá: Cao đến Thấp</option>
-                <option>Phổ biến nhất</option>
+              <select
+                value={filters.sortBy}
+                onChange={handleSortChange}
+                className="bg-transparent border-none text-on-surface font-bold focus:ring-0 cursor-pointer outline-none text-sm"
+              >
+                <option value="newest">Mới nhất</option>
+                <option value="priceAsc">Giá: Thấp đến Cao</option>
+                <option value="priceDesc">Giá: Cao đến Thấp</option>
+                <option value="popular">Phổ biến nhất</option>
               </select>
             </div>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10">
-            {PRODUCTS.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
+          {/* Loading / Error / Grid State */}
+          {isLoading ? (
+            <div className="min-h-80 flex flex-col items-center justify-center gap-4 text-secondary">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              <p className="font-medium text-sm">Đang tải danh sách sản phẩm từ máy chủ...</p>
+            </div>
+          ) : error ? (
+            <div className="min-h-80 flex flex-col items-center justify-center p-8 border border-red-200/50 rounded-2xl bg-red-500/5 text-center">
+              <p className="text-red-600 font-semibold mb-2">Đã xảy ra lỗi khi tải sản phẩm</p>
+              <p className="text-sm text-secondary max-w-md mb-6">{error}</p>
+              <button
+                onClick={() => dispatch(fetchProducts(filters))}
+                className="px-6 py-2.5 bg-primary text-white rounded-full font-bold shadow-lg shadow-primary/20 hover:bg-primary/95 transition-all"
+              >
+                Thử lại
+              </button>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="min-h-80 flex flex-col items-center justify-center p-8 border border-neutral-border rounded-2xl text-center">
+              <p className="font-semibold text-lg text-on-surface mb-2">Không tìm thấy sản phẩm nào</p>
+              <p className="text-sm text-secondary max-w-sm">
+                Vui lòng thử lại với từ khóa tìm kiếm hoặc danh mục bộ lọc khác.
+              </p>
+            </div>
+          ) : (
+            /* Product Grid */
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10">
+              {products.map((product) => {
+                // Map database ProductResponseDTO properties to ProductCard properties
+                const mappedProduct = {
+                  id: product.id,
+                  title: product.name || product.title || "Sản phẩm không tên",
+                  price:
+                    typeof product.price === "number"
+                      ? product.price.toLocaleString("vi-VN")
+                      : String(product.price),
+                  rating: product.rating ?? 5.0,
+                  image:
+                    product.imageUrl ||
+                    product.image ||
+                    "https://images.unsplash.com/photo-1584992236310-6edddc08acff?q=80&w=2070&auto=format&fit=crop",
+                };
 
-          {/* Pagination */}
-          <div className="mt-16 flex justify-center items-center gap-2">
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all">
-              <ChevronLeft size={20} />
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold">
-              1
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all">
-              2
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all">
-              3
-            </button>
-            <span className="px-2 text-secondary">...</span>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all">
-              8
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all">
-              <ChevronRight size={20} />
-            </button>
-          </div>
+                return <ProductCard key={product.id} {...mappedProduct} />;
+              })}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {!isLoading && !error && totalPages > 1 && (
+            <div className="mt-16 flex justify-center items-center gap-2">
+              <button
+                disabled={filters.page === 1}
+                onClick={() => handlePageChange(filters.page - 1)}
+                className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, index) => {
+                const pageNum = index + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-all ${
+                      filters.page === pageNum
+                        ? "bg-primary text-white"
+                        : "border border-neutral-border hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={filters.page === totalPages}
+                onClick={() => handlePageChange(filters.page + 1)}
+                className="w-10 h-10 flex items-center justify-center rounded-lg border border-neutral-border hover:border-primary hover:text-primary transition-all disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </section>
       </div>
     </main>
@@ -116,3 +156,4 @@ function ProductsPage() {
 }
 
 export default ProductsPage;
+
