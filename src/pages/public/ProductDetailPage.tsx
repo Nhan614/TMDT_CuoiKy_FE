@@ -12,9 +12,14 @@ import {
   ThermometerSun,
   ChevronRight,
   Heart,
+  Loader2,
+  ShoppingCart,
+  Check,
 } from "lucide-react";
 import Navbar from "../../components/common/Header";
 import Footer from "../../components/common/Footer";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { addToCart } from "../../features/cart/cartThunk";
 
 interface ProductCardProps {
   image: string;
@@ -76,13 +81,28 @@ function ReviewCard({ name, title, content, avatar }: ReviewCardProps) {
   );
 }
 
+// TODO: Replace PRODUCT_ID with real product id from route params when product API is integrated
+const PRODUCT_ID = 1;
+
 export default function ProductDetail() {
+  const dispatch = useAppDispatch();
+  const { isLoading: cartLoading } = useAppSelector((state) => state.cart);
+
   const [selectedImage, setSelectedImage] = useState(
     "https://lh3.googleusercontent.com/aida-public/AB6AXuDm_vrbMEx5CgF1oUHuQuf5GDkhlQ8OBFOfflMn8TgrBy28gLuaMFnnOU4RClBB8jTMU2Npwu9vb5tiH73PTpj_dgH_kAyRDQ64reU_UuthozyXQjxuoxb6hz2QdpfQLyjDQTurzXVQyf8dWf6_nEgSNhYoH3uTosDe4GD08N4My2NqYN5tQcjctdWkL4igZ5lc9TxIjwTRq38ylpA7l-YlBwqvb6GOpxsXyhxaTWyyqcqMCxJp8GyXbxe90bxi0vIpMfXJfpyMW3o",
   );
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
   const [selectedColor, setSelectedColor] = useState("Kem");
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const handleAddToCart = async () => {
+    const result = await dispatch(addToCart({ productId: PRODUCT_ID, quantity }));
+    if (addToCart.fulfilled.match(result)) {
+      setAddedToCart(true);
+      setTimeout(() => setAddedToCart(false), 2000);
+    }
+  };
 
   const productImages = [
     "https://lh3.googleusercontent.com/aida-public/AB6AXuDm_vrbMEx5CgF1oUHuQuf5GDkhlQ8OBFOfflMn8TgrBy28gLuaMFnnOU4RClBB8jTMU2Npwu9vb5tiH73PTpj_dgH_kAyRDQ64reU_UuthozyXQjxuoxb6hz2QdpfQLyjDQTurzXVQyf8dWf6_nEgSNhYoH3uTosDe4GD08N4My2NqYN5tQcjctdWkL4igZ5lc9TxIjwTRq38ylpA7l-YlBwqvb6GOpxsXyhxaTWyyqcqMCxJp8GyXbxe90bxi0vIpMfXJfpyMW3o",
@@ -240,9 +260,24 @@ export default function ProductDetail() {
                     <Plus className="w-5 h-5" />
                   </button>
                 </div>
-                <button className="flex-1 bg-primary text-white py-4 rounded-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary-container transition-all active:scale-[0.98]">
-                  Thêm vào giỏ hàng
-                </button>
+                <motion.button
+                  onClick={handleAddToCart}
+                  disabled={cartLoading}
+                  whileTap={{ scale: 0.97 }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-lg font-bold shadow-lg transition-all active:scale-[0.98] ${
+                    addedToCart
+                      ? "bg-green-600 text-white shadow-green-600/20"
+                      : "bg-primary text-white shadow-primary/20 hover:brightness-110"
+                  } disabled:opacity-60 disabled:cursor-not-allowed`}
+                >
+                  {cartLoading ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Đang thêm...</>
+                  ) : addedToCart ? (
+                    <><Check className="w-5 h-5" /> Đã thêm vào giỏ!</>
+                  ) : (
+                    <><ShoppingCart className="w-5 h-5" /> Thêm vào giỏ hàng</>
+                  )}
+                </motion.button>
               </div>
             </div>
 
