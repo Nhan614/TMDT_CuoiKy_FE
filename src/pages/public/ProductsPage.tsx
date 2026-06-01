@@ -107,8 +107,7 @@ function ProductsPage() {
                       ? product.price.toLocaleString("vi-VN")
                       : String(product.price),
                   rating: product.rating ?? 5.0,
-                  image:
-                    product.thumbnailUrl
+                  image: product.thumbnailUrl || ""
                 };
 
                 return <ProductCard key={product.id} {...mappedProduct} onAddToCart={handleAddToCart} />;

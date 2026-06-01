@@ -1,5 +1,6 @@
 import { Star, Heart } from "lucide-react";
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 import type { AddToCartRequest } from "../cart/cartType";
 
 interface ProductProps {
@@ -27,12 +28,14 @@ export default function ProductCard({
       viewport={{ once: true }}
     >
       <div className="relative aspect-4/5 bg-beige rounded-lg overflow-hidden mb-4">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          referrerPolicy="no-referrer"
-        />
+        <Link to={`/products/${id}`} className="block w-full h-full">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            referrerPolicy="no-referrer"
+          />
+        </Link>
 
         <button className="absolute top-4 right-4 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-primary hover:text-white transition-colors duration-300">
           <Heart size={20} strokeWidth={1.5} />
@@ -49,9 +52,11 @@ export default function ProductCard({
 
       <div className="space-y-1">
         <div className="flex justify-between items-start gap-2">
-          <h4 className="font-semibold text-lg text-on-surface group-hover:text-primary transition-colors leading-tight">
-            {title}
-          </h4>
+          <Link to={`/products/${id}`} className="block hover:underline truncate grow">
+            <h4 className="font-semibold text-lg text-on-surface group-hover:text-primary transition-colors leading-tight">
+              {title}
+            </h4>
+          </Link>
           <div className="flex items-center gap-1 text-yellow-500 shrink-0">
             <Star size={16} fill="currentColor" strokeWidth={0} />
             <span className="text-xs font-semibold text-secondary">

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useParams, Link } from "react-router-dom";
 import {
   Star,
   Minus,
@@ -20,14 +21,16 @@ import Navbar from "../../components/common/Header";
 import Footer from "../../components/common/Footer";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { addToCart } from "../../features/cart/cartThunk";
+import { fetchProductById, fetchProducts } from "../../features/products/productThunk";
 
 interface ProductCardProps {
+  id: number;
   image: string;
   name: string;
   price: string;
 }
 
-function ProductCard({ image, name, price }: ProductCardProps) {
+function ProductCard({ id, image, name, price }: ProductCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -35,19 +38,21 @@ function ProductCard({ image, name, price }: ProductCardProps) {
       viewport={{ once: true }}
       className="group cursor-pointer"
     >
-      <div className="aspect-[3/4] rounded-lg overflow-hidden bg-surface-container mb-4 relative">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute bottom-3 right-3 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-          <Heart className="w-5 h-5 text-primary" />
+      <Link to={`/products/${id}`}>
+        <div className="aspect-[3/4] rounded-lg overflow-hidden bg-surface-container mb-4 relative">
+          <img
+            src={image}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute bottom-3 right-3 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+            <Heart className="w-5 h-5 text-primary" />
+          </div>
         </div>
-      </div>
-      <h4 className="font-bold text-on-background mb-1">{name}</h4>
-      <p className="text-primary font-bold">{price}</p>
+        <h4 className="font-bold text-on-background mb-1 group-hover:text-primary transition-colors leading-tight truncate">{name}</h4>
+        <p className="text-primary font-bold">{price}</p>
+      </Link>
     </motion.div>
   );
 }
@@ -81,35 +86,145 @@ function ReviewCard({ name, title, content, avatar }: ReviewCardProps) {
   );
 }
 
-// TODO: Replace PRODUCT_ID with real product id from route params when product API is integrated
-const PRODUCT_ID = 1;
+function ProductDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-background animate-pulse flex flex-col justify-between">
+      <div>
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-6 py-10">
+          <div className="h-4 bg-surface-container-high rounded w-1/4 mb-12" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-24">
+            <div className="lg:col-span-7 space-y-6">
+              <div className="aspect-[4/5] rounded-xl bg-surface-container-high" />
+              <div className="grid grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-surface-container-high" />
+                ))}
+              </div>
+            </div>
+            <div className="lg:col-span-5 flex flex-col gap-8">
+              <div className="space-y-4">
+                <div className="h-4 bg-surface-container-high rounded w-1/4" />
+                <div className="h-10 bg-surface-container-high rounded w-3/4" />
+                <div className="h-5 bg-surface-container-high rounded w-1/3" />
+                <div className="h-8 bg-surface-container-high rounded w-1/4" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-surface-container-high rounded w-full" />
+                <div className="h-4 bg-surface-container-high rounded w-full" />
+                <div className="h-4 bg-surface-container-high rounded w-5/6" />
+              </div>
+              <div className="h-12 bg-surface-container-high rounded w-full mt-6" />
+              <div className="h-12 bg-surface-container-high rounded w-full" />
+            </div>
+          </div>
+        </main>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+function ProductNotFound({ error, onRetry }: { error: string; onRetry: () => void }) {
+  return (
+    <div className="min-h-screen bg-background flex flex-col justify-between">
+      <div>
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-6 py-20 flex flex-col items-center justify-center text-center">
+          <div className="max-w-md p-8 border border-outline-variant rounded-2xl bg-surface-container-low shadow-sm">
+            <h2 className="text-2xl font-bold text-on-background mb-4">Lỗi tải sản phẩm</h2>
+            <p className="text-secondary mb-8">{error || "Sản phẩm không tồn tại hoặc có lỗi xảy ra."}</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={onRetry}
+                className="px-6 py-3 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all cursor-pointer"
+              >
+                Thử lại
+              </button>
+              <Link
+                to="/products"
+                className="px-6 py-3 border border-outline text-on-background rounded-lg font-bold hover:bg-surface-container-high transition-all"
+              >
+                Về danh mục
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+      <Footer />
+    </div>
+  );
+}
 
 export default function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
+  
+  const { product, isLoading, error } = useAppSelector((state) => state.product.productDetail);
+  const relatedProducts = useAppSelector((state) => state.product.products);
   const { isLoading: cartLoading } = useAppSelector((state) => state.cart);
 
-  const [selectedImage, setSelectedImage] = useState(
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDm_vrbMEx5CgF1oUHuQuf5GDkhlQ8OBFOfflMn8TgrBy28gLuaMFnnOU4RClBB8jTMU2Npwu9vb5tiH73PTpj_dgH_kAyRDQ64reU_UuthozyXQjxuoxb6hz2QdpfQLyjDQTurzXVQyf8dWf6_nEgSNhYoH3uTosDe4GD08N4My2NqYN5tQcjctdWkL4igZ5lc9TxIjwTRq38ylpA7l-YlBwqvb6GOpxsXyhxaTWyyqcqMCxJp8GyXbxe90bxi0vIpMfXJfpyMW3o",
-  );
+  const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
   const [selectedColor, setSelectedColor] = useState("Kem");
   const [addedToCart, setAddedToCart] = useState(false);
 
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProductById(Number(id)));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (product && product.categoryId) {
+      dispatch(fetchProducts({ categoryId: product.categoryId, page: 1, size: 5, sortBy: "newest", isActive: true }));
+    }
+  }, [dispatch, product]);
+
+  useEffect(() => {
+    if (product) {
+      const imgs = product.images && product.images.length > 0 
+        ? product.images 
+        : (product.thumbnailUrl ? [product.thumbnailUrl] : []);
+      setSelectedImage(imgs[0] || "");
+    }
+  }, [product]);
+
   const handleAddToCart = async () => {
-    const result = await dispatch(addToCart({ productId: PRODUCT_ID, quantity }));
+    if (!product) return;
+    const result = await dispatch(addToCart({ productId: product.id, quantity }));
     if (addToCart.fulfilled.match(result)) {
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
     }
   };
 
-  const productImages = [
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDm_vrbMEx5CgF1oUHuQuf5GDkhlQ8OBFOfflMn8TgrBy28gLuaMFnnOU4RClBB8jTMU2Npwu9vb5tiH73PTpj_dgH_kAyRDQ64reU_UuthozyXQjxuoxb6hz2QdpfQLyjDQTurzXVQyf8dWf6_nEgSNhYoH3uTosDe4GD08N4My2NqYN5tQcjctdWkL4igZ5lc9TxIjwTRq38ylpA7l-YlBwqvb6GOpxsXyhxaTWyyqcqMCxJp8GyXbxe90bxi0vIpMfXJfpyMW3o",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDgFKGwtNPPBnlPtjp1wZbggGgAoiYa4s19rNP9f9QpJtavKAv2wAoSLwxyxuLIsa5mxr9VcadxTavRPKAnWHGnRrny96hdfuDWd5V87uiyfzqXI2xd1suKxkIKsxYrCVoJSeXmOzPj30WQ0yrs2FANFtHD7vaBNrU7bKWqKFD4n8YUbIYm05KzT47-CSNSoEqiVi8grIbXdiWvwiD0sRgFElu_61HCN2MalP0a_UI6xm2xPCED9PPNRlpJGWWxZMy6l1dRMwtFDnU",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDKByqVPIcf4EbiCar9OHHh9bPjwaZoc05wTQ_zxJUZBuyTMxc5l7B2t_6TpDhvlll3KJmHBDbFmQkYUiCvg-_COgyPuFuVSGrChNToOaeleJuU3NU8gMV-urXxH6_EmwkTJdm42_sF5NnU4H6JFt_Nu19vqJmbX8wYgc3_WMw7OTfJOfzyJt12BP7mwm8CUjJpKDjft3y8T1_p15bLDcHPXOdK87jzez582Ns1ppYZOYkAcqzD0k0Ut34X5NXwS-oDxmn3FcRoir4",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuAR3WPG3Vct-inl41ztj9P5rvwMO0DOOgY8kMliso65IBOhGq0dCqRVxHem6hcD1fIthszIRq2uVCKHNo-IXrykttiCpCeSuQ9O8N5QPg-g1qaKqGraOMV6Y7_VVYAHxjzvjjCxZk4TnKWWVZjWhW8O-C-eSYCRdSfRPeuf5-CL6QPv0m_Lv_UNfeFLPM9exYBMwzJRvF6PfhtACO5aFlPMymIeQt25jJ9SzbWOYoQQIgNj-s0NxGI6QzbrfTRu2vFpn1Wn77mACgE",
-  ];
+  const handleRetry = () => {
+    if (id) {
+      dispatch(fetchProductById(Number(id)));
+    }
+  };
+
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
+
+  if (error || !product) {
+    return <ProductNotFound error={error || "Không tìm thấy sản phẩm."} onRetry={handleRetry} />;
+  }
+
+  const productImages = product.images && product.images.length > 0 
+    ? product.images 
+    : (product.thumbnailUrl ? [product.thumbnailUrl] : []);
+
+  const priceNum = typeof product.price === "number" ? product.price : parseFloat(String(product.price)) || 0;
+  const hasDiscount = product.discountPrice !== undefined && product.discountPrice !== null;
+  const discountPriceNum = hasDiscount ? (typeof product.discountPrice === "number" ? product.discountPrice : parseFloat(String(product.discountPrice)) || 0) : 0;
+
+  const filteredRelated = relatedProducts
+    .filter((p) => p.id !== product.id)
+    .slice(0, 4);
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,16 +233,22 @@ export default function ProductDetail() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         {/* Breadcrumbs */}
         <nav className="flex items-center text-xs uppercase tracking-widest text-secondary gap-3 mb-12">
-          <a href="#" className="hover:text-primary">
+          <Link to="/home" className="hover:text-primary">
             Trang chủ
-          </a>
+          </Link>
           <ChevronRight className="w-3 h-3" />
-          <a href="#" className="hover:text-primary">
+          <Link to="/products" className="hover:text-primary">
             Cửa hàng
-          </a>
+          </Link>
+          {product.categoryName && (
+            <>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-secondary">{product.categoryName}</span>
+            </>
+          )}
           <ChevronRight className="w-3 h-3" />
-          <span className="text-on-background font-bold">
-            Áo Len Crochet Họa Tiết Hoa
+          <span className="text-on-background font-bold truncate max-w-[200px] md:max-w-xs">
+            {product.name}
           </span>
         </nav>
 
@@ -137,7 +258,7 @@ export default function ProductDetail() {
           <div className="lg:col-span-7 space-y-6">
             <motion.div
               layoutId="main-image"
-              className="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container shadow-sm"
+              className="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container shadow-sm flex items-center justify-center"
             >
               <AnimatePresence mode="wait">
                 <motion.img
@@ -147,57 +268,89 @@ export default function ProductDetail() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
                   src={selectedImage}
-                  alt="Product"
+                  alt={product.name}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
               </AnimatePresence>
             </motion.div>
-            <div className="grid grid-cols-4 gap-4">
-              {productImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImage(img)}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"}`}
-                >
-                  <img
-                    src={img}
-                    alt={`Thumb ${idx}`}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                </button>
-              ))}
-            </div>
+            {productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-4">
+                {productImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(img)}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"}`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumb ${idx}`}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Info */}
           <div className="lg:col-span-5 flex flex-col gap-8">
             <header className="space-y-4">
               <span className="text-xs font-bold text-primary uppercase tracking-[0.2em]">
-                Handmade Selection
+                {product.artisanName ? `Nghệ nhân: ${product.artisanName}` : "Handmade Selection"}
               </span>
               <h1 className="text-4xl font-bold text-on-background leading-tight">
-                Áo Len Crochet Họa Tiết Hoa
+                {product.name}
               </h1>
               <div className="flex items-center gap-4">
                 <div className="flex text-primary">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-current" />
-                  ))}
+                  {[...Array(5)].map((_, i) => {
+                    const stars = Math.round(product.averageRating ?? 5);
+                    return <Star key={i} className={`w-4 h-4 ${i < stars ? "fill-current" : "text-outline-variant"}`} />;
+                  })}
                 </div>
-                <span className="text-secondary text-sm">(12 đánh giá)</span>
+                <span className="text-secondary text-sm">
+                  ({product.averageRating ? product.averageRating.toFixed(1) : "Chưa có"} đánh giá)
+                </span>
               </div>
-              <div className="text-3xl font-bold text-primary">450.000đ</div>
+              <div>
+                {hasDiscount ? (
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-3xl font-bold text-primary">
+                      {discountPriceNum.toLocaleString("vi-VN")}đ
+                    </span>
+                    <span className="text-lg text-secondary line-through">
+                      {priceNum.toLocaleString("vi-VN")}đ
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-3xl font-bold text-primary">
+                    {priceNum.toLocaleString("vi-VN")}đ
+                  </span>
+                )}
+              </div>
             </header>
 
             <p className="text-secondary leading-relaxed text-body-lg">
-              Sản phẩm được hoàn thiện thủ công tỉ mỉ với họa tiết hoa crochet
-              độc đáo. Chất liệu 100% cotton tự nhiên mềm mại, thoáng mát và bền
-              bỉ theo thời gian.
+              {product.shortDescription || "Sản phẩm được hoàn thiện hoàn toàn thủ công từ nguyên vật liệu thân thiện với môi trường."}
             </p>
 
             <div className="space-y-8">
+              {/* Sizing & PreOrder Information Badges if applicable */}
+              <div className="flex flex-wrap gap-4 text-xs font-semibold text-secondary">
+                {product.stockQuantity !== undefined && (
+                  <div className="px-3 py-1.5 bg-surface-container rounded-full">
+                    Còn lại: <span className="text-on-background font-bold">{product.stockQuantity}</span>
+                  </div>
+                )}
+                {product.isPreOrder && (
+                  <div className="px-3 py-1.5 bg-primary/10 text-primary rounded-full">
+                    Đặt trước (Sản xuất trong khoảng: {product.makingDays || 7} ngày)
+                  </div>
+                )}
+              </div>
+
               {/* Colors */}
               <div>
                 <span className="text-xs font-bold text-on-background uppercase tracking-widest block mb-4">
@@ -262,18 +415,22 @@ export default function ProductDetail() {
                 </div>
                 <motion.button
                   onClick={handleAddToCart}
-                  disabled={cartLoading}
+                  disabled={cartLoading || (product.stockQuantity !== undefined && product.stockQuantity <= 0 && !product.isPreOrder)}
                   whileTap={{ scale: 0.97 }}
                   className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-lg font-bold shadow-lg transition-all active:scale-[0.98] ${
                     addedToCart
                       ? "bg-green-600 text-white shadow-green-600/20"
-                      : "bg-primary text-white shadow-primary/20 hover:brightness-110"
+                      : (product.stockQuantity !== undefined && product.stockQuantity <= 0 && !product.isPreOrder)
+                        ? "bg-outline-variant text-secondary cursor-not-allowed shadow-none"
+                        : "bg-primary text-white shadow-primary/20 hover:brightness-110"
                   } disabled:opacity-60 disabled:cursor-not-allowed`}
                 >
                   {cartLoading ? (
                     <><Loader2 className="w-5 h-5 animate-spin" /> Đang thêm...</>
                   ) : addedToCart ? (
                     <><Check className="w-5 h-5" /> Đã thêm vào giỏ!</>
+                  ) : (product.stockQuantity !== undefined && product.stockQuantity <= 0 && !product.isPreOrder) ? (
+                    <>Hết hàng</>
                   ) : (
                     <><ShoppingCart className="w-5 h-5" /> Thêm vào giỏ hàng</>
                   )}
@@ -284,11 +441,11 @@ export default function ProductDetail() {
             <footer className="pt-8 border-t border-outline-variant flex gap-8">
               <div className="flex items-center gap-2 text-secondary text-xs font-bold uppercase tracking-wider">
                 <Leaf className="w-4 h-4 text-primary" />
-                100% Organic Cotton
+                100% Organic
               </div>
               <div className="flex items-center gap-2 text-secondary text-xs font-bold uppercase tracking-wider">
                 <Hand className="w-4 h-4 text-primary" />
-                Handmade Quality
+                Thủ công Việt Nam
               </div>
             </footer>
           </div>
@@ -300,22 +457,38 @@ export default function ProductDetail() {
             <h3 className="text-2xl font-bold mb-8">Thông tin chi tiết</h3>
             <div className="space-y-6 text-secondary leading-relaxed">
               <p>
-                Từng chiếc áo là kết quả của hàng giờ đồng hồ đan móc thủ công
-                bởi các nghệ nhân lành nghề. Họa tiết hoa được lấy cảm hứng từ
-                những vườn hoa nhiệt đới, mang lại vẻ đẹp tươi mới.
+                {product.description || "Từng chi tiết sản phẩm được gia công thủ công một cách tỉ mỉ bởi nghệ nhân lành nghề của chúng tôi."}
               </p>
               <ul className="space-y-4">
-                {[
-                  "Chất liệu: 100% Sợi Cotton tự nhiên không gây kích ứng da.",
-                  "Kỹ thuật: Crochet (đan móc) thủ công hoàn toàn.",
-                  "Độ bền: Sợi được xử lý chống co rút và xù lông.",
-                  "Sản xuất tại: Việt Nam.",
-                ].map((li, idx) => (
-                  <li key={idx} className="flex gap-3 items-start">
+                {product.materials && product.materials.length > 0 ? (
+                  product.materials.map((mat, idx) => (
+                    <li key={idx} className="flex gap-3 items-start">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                      Chất liệu: {mat}
+                    </li>
+                  ))
+                ) : (
+                  <li className="flex gap-3 items-start">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                    {li}
+                    Chất liệu: Nguyên liệu hữu cơ tự nhiên cao cấp
                   </li>
-                ))}
+                )}
+                {product.categoryName && (
+                  <li className="flex gap-3 items-start">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                    Danh mục: {product.categoryName}
+                  </li>
+                )}
+                {product.artisanName && (
+                  <li className="flex gap-3 items-start">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                    Được làm bởi nghệ nhân: {product.artisanName}
+                  </li>
+                )}
+                <li className="flex gap-3 items-start">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                  Sản xuất hoàn toàn thủ công tại Việt Nam.
+                </li>
               </ul>
             </div>
           </div>
@@ -346,7 +519,7 @@ export default function ProductDetail() {
         <section className="py-20 border-t border-outline-variant">
           <div className="flex justify-between items-end mb-12">
             <h3 className="text-2xl font-bold">Đánh giá từ khách hàng</h3>
-            <button className="text-primary font-bold border-b border-primary pb-px hover:border-transparent transition-all">
+            <button className="text-primary font-bold border-b border-primary pb-px hover:border-transparent transition-all cursor-pointer">
               Viết đánh giá
             </button>
           </div>
@@ -354,50 +527,50 @@ export default function ProductDetail() {
             <ReviewCard
               name="Minh Hạnh"
               title="Chất liệu tuyệt vời"
-              content="Áo mặc rất mát, len mềm không bị ngứa. Họa tiết hoa móc rất đều và đẹp, mình cực kỳ hài lòng."
+              content="Sản phẩm bền đẹp, sờ vào rất thích và có độ hoàn thiện cực kỳ cao. Rất đáng mua."
               avatar="M"
             />
             <ReviewCard
               name="Anh Tuấn"
-              title="Quà tặng ý nghĩa"
-              content="Mình mua tặng mẹ, mẹ khen lắm. Đóng gói rất cẩn thận và thơm mùi thảo mộc. Cảm ơn Len & Sợi!"
+              title="Gói hàng cẩn thận"
+              content="Được đóng gói rất tỉ mỉ, có kèm quà tặng và thiệp viết tay xinh xắn của nghệ nhân."
               avatar="A"
             />
             <ReviewCard
               name="Lan Chi"
-              title="Đáng đồng tiền"
-              content="Đúng là hàng thủ công có khác, cầm cái áo nặng tay và sướng lắm. Màu Kem tự nhiên rất dễ phối đồ."
+              title="Hoàn toàn hài lòng"
+              content="Sản phẩm rất đẹp giống mô tả, nghệ nhân tư vấn nhiệt tình. Sẽ tiếp tục ủng hộ shop."
               avatar="L"
             />
           </div>
         </section>
 
         {/* Related Products */}
-        <section className="py-20 border-t border-outline-variant">
-          <h3 className="text-2xl font-bold mb-12">Sản phẩm tương tự</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <ProductCard
-              image="https://lh3.googleusercontent.com/aida-public/AB6AXuCVrlkwSX8k86l6czr4tmcfYTAuITAykoEyvDN2BbI_35DGhSPZy2G2n6HPOLaft28PaoCmS2JCE0Q4GghNaVtQRLmUpW9zg_0vHuL4tdJXfsrCn61-FPmR7yS55Mik48mvzBzbMDBqhcRsEUxtpd3UxyCy8roGe4R74Gr3PKGnI2XCajXan_bwQ1-wZgzyojxWs5XY-qFR8wxtbxVpAQKsovQrIrxgU1wmxFmo-xMCwSsYXrWoR0v7_eDIyC93agbb1dJKiAS3xFg"
-              name="Túi Tote Crochet"
-              price="220.000đ"
-            />
-            <ProductCard
-              image="https://lh3.googleusercontent.com/aida-public/AB6AXuC1PNg-zQ_Vo2FbfXaos6az2DGgkROtyG_tEB7V8Q-EOswjmhXUx7OQvq0sd7ssPDMAbmuSnGbpQIYjqG8nDdlxiyPj3tsyi0rhPftUBQhjZEeQ4420AhsGGQwYEfy2z9lgWNWZLqxn_eF5LnonI77DvP9l955g_oonhvIwalYdi7XmTgx8L1ZZjk-GhScK3ECh_ExlRmR4kUCNqZKLE2W1LA4RbcfBnC3TY3gpnqRgn-OeLJQjYgRgFPtgtpqUPfYheoJwH1vpD40"
-              name="Khăn Choàng Bohemian"
-              price="350.000đ"
-            />
-            <ProductCard
-              image="https://lh3.googleusercontent.com/aida-public/AB6AXuB2t9DfpKimrhHZJzszjLOEYXJtAwozR_MyGLpuZiTPhYXTC654nRQFNed7GGzqwRn_RgP4pS2ssle0n7ctPzspwyivKV8Wj0b5l62zW9kNTBwTOrJFnX9ap8aD867Xs-pkNl3reg5NHSIQH1ZkI51BnFHkqaNvNtO5t5nzI6WQzuqYseDwz32DIF9gdY4O5EQe1YaXux1wpMVvBSoW-dIiTfP6i0i9aUrgQvGV0hUu3_Fy0MMCDjX2ZKNb9jNkta3EzZPFAjTiEf4"
-              name="Mũ Bucket Cotton"
-              price="180.000đ"
-            />
-            <ProductCard
-              image="https://lh3.googleusercontent.com/aida-public/AB6AXuAcAT6PqOauNlxu3O4hCWSAKrmwunLI4ExWrubwgT4VLS52QLQKtPhTnEttMc8HoEyWGC0bdYJuJnFq1vXA5cRxrvCOfrvAQnKUfjwjOj2RmDgZbiZYAslIZ3nb2OaNVK_NQnLrrzN0mkT8k8fjHBk-uNg1Zfd-wLqqsekVAxB64I9U09-inTZNlBK6SEiTkc2Cc__AP56bcVgQssta5xImi5qlx5V9zQbenDrS8SbkmvEDv4IimBe7qf2woUBJdOsLKeSNr4VKWYc"
-              name="Áo Gilet Caro"
-              price="380.000đ"
-            />
-          </div>
-        </section>
+        {filteredRelated.length > 0 && (
+          <section className="py-20 border-t border-outline-variant">
+            <h3 className="text-2xl font-bold mb-12">Sản phẩm tương tự</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {filteredRelated.map((p) => {
+                const pPrice = typeof p.price === "number" ? p.price : parseFloat(String(p.price)) || 0;
+                const pHasDiscount = p.discountPrice !== undefined && p.discountPrice !== null;
+                const pDiscountPriceNum = pHasDiscount ? (typeof p.discountPrice === "number" ? p.discountPrice : parseFloat(String(p.discountPrice)) || 0) : 0;
+                const displayPrice = pHasDiscount 
+                  ? `${pDiscountPriceNum.toLocaleString("vi-VN")}đ` 
+                  : `${pPrice.toLocaleString("vi-VN")}đ`;
+
+                return (
+                  <ProductCard
+                    key={p.id}
+                    id={p.id}
+                    image={p.thumbnailUrl || ""}
+                    name={p.name || p.title || ""}
+                    price={displayPrice}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )}
       </main>
       <Footer />
     </div>
