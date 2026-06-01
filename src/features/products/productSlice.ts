@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ProductState, ProductFilterParams, ProductResponseDTO, SpringPage } from "./productType";
-import { fetchProducts } from "./productThunk";
+import { fetchProducts, fetchProductById } from "./productThunk";
 
 const initialFilters: ProductFilterParams = {
   page: 1,
@@ -18,6 +18,11 @@ const initialState: ProductState = {
   isLoading: false,
   error: null,
   filters: initialFilters,
+  productDetail: {
+    product: null,
+    isLoading: false,
+    error: null,
+  },
 };
 
 export const productSlice = createSlice({
@@ -83,6 +88,18 @@ export const productSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string || "Đã xảy ra lỗi khi lấy danh sách sản phẩm.";
+      })
+      .addCase(fetchProductById.pending, (state) => {
+        state.productDetail.isLoading = true;
+        state.productDetail.error = null;
+      })
+      .addCase(fetchProductById.fulfilled, (state, action) => {
+        state.productDetail.isLoading = false;
+        state.productDetail.product = action.payload.data;
+      })
+      .addCase(fetchProductById.rejected, (state, action) => {
+        state.productDetail.isLoading = false;
+        state.productDetail.error = action.payload as string || "Đã xảy ra lỗi khi lấy thông tin chi tiết sản phẩm.";
       });
   },
 });

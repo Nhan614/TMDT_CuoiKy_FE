@@ -21,10 +21,6 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
 
-  {
-    path: "/productDetail",
-    element: <ProductDetail />,
-  },
   // --- PUBLIC ROUTES ---
   {
     path: "/",
@@ -41,6 +37,10 @@ export const router = createBrowserRouter([
       {
         path: "/products",
         element: <ProductsPage />,
+      },
+      {
+        path: "/products/:id",
+        element: <ProductDetail />,
       },
       {
         path: "/about",

@@ -41,3 +41,22 @@ export const fetchProducts = createAsyncThunk<
     return rejectWithValue("Lỗi kết nối đến máy chủ!");
   }
 });
+
+// --- FETCH PRODUCT BY ID ---
+export const fetchProductById = createAsyncThunk<
+  ApiResponse<ProductResponseDTO>,
+  number,
+  { rejectValue: string }
+>("products/fetchProductById", async (id, { rejectWithValue }) => {
+  try {
+    const response = await axiosClient.get<ApiResponse<ProductResponseDTO>>(`/products/${id}`);
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      return rejectWithValue(
+        error.response.data?.message || "Lấy chi tiết sản phẩm thất bại!"
+      );
+    }
+    return rejectWithValue("Lỗi kết nối đến máy chủ!");
+  }
+});
