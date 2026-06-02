@@ -26,18 +26,7 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
 
-  {
-    path: "/productDetail",
-    element: <ProductDetail />,
-  },
-
-  // ── Payment result (public — receives VNPay redirect, no layout needed) ──
-  {
-    path: "/payment/result",
-    element: <PaymentResultPage />,
-  },
-
-  // --- PUBLIC ROUTES (with layout) ---
+  // --- PUBLIC ROUTES ---
   {
     path: "/",
     element: <PublicLayout />,
@@ -53,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: "/products",
         element: <ProductsPage />,
+      },
+      {
+        path: "/products/:id",
+        element: <ProductDetail />,
       },
       {
         path: "/about",
