@@ -63,6 +63,10 @@ export const router = createBrowserRouter([
         path: "/cart",
         element: <CartPage />,
       },
+      {
+        path: "/payment/result",
+        element: <PaymentResultPage />,
+      },
     ],
   },
 
@@ -73,11 +77,11 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "/checkout",      element: <CheckoutPage /> },
-          { path: "/orders",        element: <OrdersPage /> },
-          { path: "/orders/:id",    element: <OrderDetailPage /> },
-          { path: "/dashboard",     element: <DashboardPage /> },
-          { path: "/admin/orders",  element: <AdminOrdersPage /> },
+          { path: "/checkout", element: <CheckoutPage /> },
+          { path: "/orders", element: <OrdersPage /> },
+          { path: "/orders/:id", element: <OrderDetailPage /> },
+          { path: "/dashboard", element: <DashboardPage /> },
+          { path: "/admin/orders", element: <AdminOrdersPage /> },
         ],
       },
     ],
