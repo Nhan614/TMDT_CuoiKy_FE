@@ -108,7 +108,7 @@ function ProductsPage() {
                       : String(product.price),
                   rating: product.rating ?? 5.0,
                   image:
-                    product.thumbnailUrl
+                    product.thumbnailUrl ?? ""
                 };
 
                 return <ProductCard key={product.id} {...mappedProduct} onAddToCart={handleAddToCart} />;
