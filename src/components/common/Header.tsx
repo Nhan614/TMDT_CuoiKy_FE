@@ -1,6 +1,7 @@
 import {
   LogOut,
   Menu,
+  Package,
   ShoppingBag,
   User,
   X,
@@ -84,25 +85,38 @@ function Header() {
             <a href="#" className="hover:text-stone-900 transition-colors">
               Liên Hệ
             </a>
+
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/cart" className="hover:text-stone-900 transition-colors">
-              <button className="p-2 text-gray-600 hover:text-stone-900 transition-colors relative">
-                <ShoppingBag size={20} />
-                {cart && cart.totalItems > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
-                    {cart.totalItems}
-                  </span>
-                )}
-              </button>
+            <Link
+              to="/cart"
+              className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+              title="Giỏ hàng"
+            >
+              <ShoppingBag size={20} />
+              {cart && cart.totalItems > 0 && (
+                <span className="absolute top-0 right-0 w-4 h-4 bg-stone-800 text-white text-[10px] flex items-center justify-center rounded-full">
+                  {cart.totalItems}
+                </span>
+              )}
             </Link>
+
+            {isLoggedIn && (
+              <Link
+                to="/orders"
+                className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+                title="Đơn hàng"
+              >
+                <Package size={20} />
+              </Link>
+            )}
 
             {/* Xử lý hiển thị User hoặc Logout dựa trên trạng thái đăng nhập */}
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+                className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors cursor-pointer"
                 title="Đăng xuất"
               >
                 <LogOut size={20} />
@@ -139,6 +153,15 @@ function Header() {
           <a href="#" className="block text-stone-600 font-medium py-2">
             Liên Hệ
           </a>
+          {isLoggedIn && (
+            <Link
+              to="/orders"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-2 text-stone-600 font-medium py-2 hover:text-primary transition-colors"
+            >
+              Đơn hàng của tôi
+            </Link>
+          )}
         </motion.div>
       )}
     </nav>

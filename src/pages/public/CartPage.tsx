@@ -337,21 +337,33 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <motion.button
-                whileHover={{ scale: items.length > 0 ? 1.02 : 1 }}
-                whileTap={{ scale: items.length > 0 ? 0.98 : 1 }}
-                disabled={items.length === 0 || isLoading}
-                className="w-full bg-primary text-white font-bold py-4 rounded-xl text-lg hover:brightness-110 shadow-lg shadow-primary/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 size={18} className="animate-spin" />
-                    Đang xử lý...
-                  </span>
-                ) : (
-                  "Tiến hành thanh toán"
-                )}
-              </motion.button>
+              {items.length > 0 ? (
+                <Link to="/checkout" className="block">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={isLoading}
+                    id="cart-checkout-btn"
+                    className="w-full bg-primary text-white font-bold py-4 rounded-xl text-lg hover:brightness-110 shadow-lg shadow-primary/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 size={18} className="animate-spin" />
+                        Đang xử lý...
+                      </span>
+                    ) : (
+                      "Tiến hành thanh toán"
+                    )}
+                  </motion.button>
+                </Link>
+              ) : (
+                <motion.button
+                  disabled
+                  className="w-full bg-primary text-white font-bold py-4 rounded-xl text-lg opacity-40 cursor-not-allowed"
+                >
+                  Tiến hành thanh toán
+                </motion.button>
+              )}
 
               <div className="mt-8 flex items-center justify-center gap-6 opacity-30">
                 <Wallet size={20} />

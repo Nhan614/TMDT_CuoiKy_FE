@@ -9,6 +9,11 @@ import ProductsPage from "../pages/public/ProductsPage";
 import CartPage from "../pages/public/CartPage";
 import ProductDetail from "../pages/public/ProductDetailPage";
 import ArtisanDetail from "../pages/public/ArtisanDetail";
+import CheckoutPage from "../pages/public/CheckoutPage";
+import PaymentResultPage from "../pages/public/PaymentResultPage";
+import OrdersPage from "../pages/public/OrdersPage";
+import OrderDetailPage from "../pages/public/OrderDetailPage";
+import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
 
 export const router = createBrowserRouter([
   {
@@ -47,11 +52,11 @@ export const router = createBrowserRouter([
         element: <AboutPage />,
       },
       {
-        path: "/artisan", // 
+        path: "/artisan",
         element: <ArtisanPage />,
       },
       {
-        path: "/artisans/:id", //
+        path: "/artisans/:id",
         element: <ArtisanDetail />,
       },
       {
@@ -61,13 +66,19 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // --- PRIVATE ROUTES ---
+  // --- PRIVATE ROUTES (auth required, with layout) ---
   {
-    element: <ProtectedRoute />,
+    element: <PublicLayout />,
     children: [
       {
-        path: "/dashboard",
-        element: <DashboardPage />,
+        element: <ProtectedRoute />,
+        children: [
+          { path: "/checkout",      element: <CheckoutPage /> },
+          { path: "/orders",        element: <OrdersPage /> },
+          { path: "/orders/:id",    element: <OrderDetailPage /> },
+          { path: "/dashboard",     element: <DashboardPage /> },
+          { path: "/admin/orders",  element: <AdminOrdersPage /> },
+        ],
       },
     ],
   },
