@@ -22,7 +22,7 @@ import Footer from "../../components/common/Footer";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { addToCart } from "../../features/cart/cartThunk";
 import { fetchProductById, fetchProducts } from "../../features/products/productThunk";
-
+import CommentSection from "../../features/comment/CommentSection";
 interface ProductCardProps {
   id: number;
   image: string;
@@ -57,34 +57,6 @@ function ProductCard({ id, image, name, price }: ProductCardProps) {
   );
 }
 
-interface ReviewCardProps {
-  name: string;
-  title: string;
-  content: string;
-  avatar: string;
-}
-
-function ReviewCard({ name, title, content, avatar }: ReviewCardProps) {
-  return (
-    <div className="p-8 bg-surface-container-low rounded-xl">
-      <div className="flex text-primary mb-3">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-current" />
-        ))}
-      </div>
-      <p className="font-bold mb-2">{title}</p>
-      <p className="text-body-md text-secondary italic leading-relaxed">
-        "{content}"
-      </p>
-      <div className="mt-6 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-outline-variant flex items-center justify-center font-bold text-sm text-primary">
-          {avatar}
-        </div>
-        <span className="text-sm font-bold text-on-background">{name}</span>
-      </div>
-    </div>
-  );
-}
 
 function ProductDetailSkeleton() {
   return (
@@ -159,7 +131,7 @@ function ProductNotFound({ error, onRetry }: { error: string; onRetry: () => voi
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  
+
   const { product, isLoading, error } = useAppSelector((state) => state.product.productDetail);
   const relatedProducts = useAppSelector((state) => state.product.products);
   const { isLoading: cartLoading } = useAppSelector((state) => state.cart);
@@ -184,8 +156,8 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (product) {
-      const imgs = product.images && product.images.length > 0 
-        ? product.images 
+      const imgs = product.images && product.images.length > 0
+        ? product.images
         : (product.thumbnailUrl ? [product.thumbnailUrl] : []);
       setSelectedImage(imgs[0] || "");
     }
@@ -214,8 +186,8 @@ export default function ProductDetail() {
     return <ProductNotFound error={error || "Không tìm thấy sản phẩm."} onRetry={handleRetry} />;
   }
 
-  const productImages = product.images && product.images.length > 0 
-    ? product.images 
+  const productImages = product.images && product.images.length > 0
+    ? product.images
     : (product.thumbnailUrl ? [product.thumbnailUrl] : []);
 
   const priceNum = typeof product.price === "number" ? product.price : parseFloat(String(product.price)) || 0;
@@ -417,13 +389,12 @@ export default function ProductDetail() {
                   onClick={handleAddToCart}
                   disabled={cartLoading || (product.stockQuantity !== undefined && product.stockQuantity <= 0 && !product.isPreOrder)}
                   whileTap={{ scale: 0.97 }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-lg font-bold shadow-lg transition-all active:scale-[0.98] ${
-                    addedToCart
-                      ? "bg-green-600 text-white shadow-green-600/20"
-                      : (product.stockQuantity !== undefined && product.stockQuantity <= 0 && !product.isPreOrder)
-                        ? "bg-outline-variant text-secondary cursor-not-allowed shadow-none"
-                        : "bg-primary text-white shadow-primary/20 hover:brightness-110"
-                  } disabled:opacity-60 disabled:cursor-not-allowed`}
+                  className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-lg font-bold shadow-lg transition-all active:scale-[0.98] ${addedToCart
+                    ? "bg-green-600 text-white shadow-green-600/20"
+                    : (product.stockQuantity !== undefined && product.stockQuantity <= 0 && !product.isPreOrder)
+                      ? "bg-outline-variant text-secondary cursor-not-allowed shadow-none"
+                      : "bg-primary text-white shadow-primary/20 hover:brightness-110"
+                    } disabled:opacity-60 disabled:cursor-not-allowed`}
                 >
                   {cartLoading ? (
                     <><Loader2 className="w-5 h-5 animate-spin" /> Đang thêm...</>
@@ -516,34 +487,7 @@ export default function ProductDetail() {
         </section>
 
         {/* Reviews */}
-        <section className="py-20 border-t border-outline-variant">
-          <div className="flex justify-between items-end mb-12">
-            <h3 className="text-2xl font-bold">Đánh giá từ khách hàng</h3>
-            <button className="text-primary font-bold border-b border-primary pb-px hover:border-transparent transition-all cursor-pointer">
-              Viết đánh giá
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ReviewCard
-              name="Minh Hạnh"
-              title="Chất liệu tuyệt vời"
-              content="Sản phẩm bền đẹp, sờ vào rất thích và có độ hoàn thiện cực kỳ cao. Rất đáng mua."
-              avatar="M"
-            />
-            <ReviewCard
-              name="Anh Tuấn"
-              title="Gói hàng cẩn thận"
-              content="Được đóng gói rất tỉ mỉ, có kèm quà tặng và thiệp viết tay xinh xắn của nghệ nhân."
-              avatar="A"
-            />
-            <ReviewCard
-              name="Lan Chi"
-              title="Hoàn toàn hài lòng"
-              content="Sản phẩm rất đẹp giống mô tả, nghệ nhân tư vấn nhiệt tình. Sẽ tiếp tục ủng hộ shop."
-              avatar="L"
-            />
-          </div>
-        </section>
+        <CommentSection productId={Number(id)} />
 
         {/* Related Products */}
         {filteredRelated.length > 0 && (
@@ -554,8 +498,8 @@ export default function ProductDetail() {
                 const pPrice = typeof p.price === "number" ? p.price : parseFloat(String(p.price)) || 0;
                 const pHasDiscount = p.discountPrice !== undefined && p.discountPrice !== null;
                 const pDiscountPriceNum = pHasDiscount ? (typeof p.discountPrice === "number" ? p.discountPrice : parseFloat(String(p.discountPrice)) || 0) : 0;
-                const displayPrice = pHasDiscount 
-                  ? `${pDiscountPriceNum.toLocaleString("vi-VN")}đ` 
+                const displayPrice = pHasDiscount
+                  ? `${pDiscountPriceNum.toLocaleString("vi-VN")}đ`
                   : `${pPrice.toLocaleString("vi-VN")}đ`;
 
                 return (
