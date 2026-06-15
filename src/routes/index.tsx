@@ -14,6 +14,12 @@ import PaymentResultPage from "../pages/public/PaymentResultPage";
 import OrdersPage from "../pages/public/OrdersPage";
 import OrderDetailPage from "../pages/public/OrderDetailPage";
 import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
+import ProfilePage from "../pages/public/ProfilePage";
+import CustomOrderFormPage from "../pages/public/CustomOrderFormPage";
+import MyCustomOrdersPage from "../pages/public/MyCustomOrdersPage";
+import MyCustomOrderDetailPage from "../pages/public/MyCustomOrderDetailPage";
+import ArtisanCustomOrdersPage from "../pages/public/ArtisanCustomOrdersPage";
+import ArtisanCustomOrderDetailPage from "../pages/public/ArtisanCustomOrderDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -82,6 +88,15 @@ export const router = createBrowserRouter([
           { path: "/orders/:id", element: <OrderDetailPage /> },
           { path: "/dashboard", element: <DashboardPage /> },
           { path: "/admin/orders", element: <AdminOrdersPage /> },
+          // Profile
+          { path: "/profile", element: <ProfilePage /> },
+          // Custom Orders (User)
+          { path: "/custom-orders/create", element: <CustomOrderFormPage /> },
+          { path: "/custom-orders/my", element: <MyCustomOrdersPage /> },
+          { path: "/custom-orders/my/:id", element: <MyCustomOrderDetailPage /> },
+          // Custom Orders (Artisan)
+          { path: "/custom-orders/artisan", element: <ArtisanCustomOrdersPage /> },
+          { path: "/custom-orders/artisan/:id", element: <ArtisanCustomOrderDetailPage /> },
         ],
       },
     ],
