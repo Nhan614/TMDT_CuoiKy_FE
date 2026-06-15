@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import { HomePage, LoginPage, RegisterPage } from "../pages/public";
 import { DashboardPage } from "../pages/admin";
 import PublicLayout from "../components/layouts/publicLayout";
+import AdminLayout from "../components/layouts/adminLayout";
 import AboutPage from "../pages/public/AboutPage";
 import ArtisanPage from "../pages/public/ArtisanPage";
 import ProductsPage from "../pages/public/ProductsPage";
@@ -20,6 +21,7 @@ import MyCustomOrdersPage from "../pages/public/MyCustomOrdersPage";
 import MyCustomOrderDetailPage from "../pages/public/MyCustomOrderDetailPage";
 import ArtisanCustomOrdersPage from "../pages/public/ArtisanCustomOrdersPage";
 import ArtisanCustomOrderDetailPage from "../pages/public/ArtisanCustomOrderDetailPage";
+import UnauthorizedPage from "../pages/public/UnauthorizedPage";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +32,11 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+
+  {
+    path: "/unauthorized",
+    element: <UnauthorizedPage />,
   },
 
   // --- PUBLIC ROUTES ---
@@ -80,23 +87,45 @@ export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
     children: [
+      // Common authenticated routes (USER, ARTISAN, ADMIN)
       {
         element: <ProtectedRoute />,
         children: [
           { path: "/checkout", element: <CheckoutPage /> },
           { path: "/orders", element: <OrdersPage /> },
           { path: "/orders/:id", element: <OrderDetailPage /> },
-          { path: "/dashboard", element: <DashboardPage /> },
-          { path: "/admin/orders", element: <AdminOrdersPage /> },
-          // Profile
           { path: "/profile", element: <ProfilePage /> },
-          // Custom Orders (User)
+        ],
+      },
+      // User only routes
+      {
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [
           { path: "/custom-orders/create", element: <CustomOrderFormPage /> },
           { path: "/custom-orders/my", element: <MyCustomOrdersPage /> },
           { path: "/custom-orders/my/:id", element: <MyCustomOrderDetailPage /> },
-          // Custom Orders (Artisan)
+        ],
+      },
+      // Artisan only routes
+      {
+        element: <ProtectedRoute allowedRoles={["ARTISAN"]} />,
+        children: [
           { path: "/custom-orders/artisan", element: <ArtisanCustomOrdersPage /> },
           { path: "/custom-orders/artisan/:id", element: <ArtisanCustomOrderDetailPage /> },
+        ],
+      },
+    ],
+  },
+
+  // --- ADMIN PRIVATE ROUTES (with AdminLayout) ---
+  {
+    element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          { path: "/dashboard", element: <DashboardPage /> },
+          { path: "/admin/orders", element: <AdminOrdersPage /> },
         ],
       },
     ],

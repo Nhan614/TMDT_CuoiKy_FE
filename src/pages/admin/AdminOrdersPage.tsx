@@ -25,37 +25,37 @@ const formatDate = (iso: string) =>
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const ORDER_STATUS_CONFIG: Record<OrderStatus, { label: string; className: string }> = {
-  PENDING:    { label: 'Chờ xác nhận', className: 'bg-amber-100 text-amber-700 border-amber-200' },
-  CONFIRMED:  { label: 'Đã xác nhận',  className: 'bg-blue-100 text-blue-700 border-blue-200' },
-  PROCESSING: { label: 'Đang xử lý',   className: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-  SHIPPED:    { label: 'Đang giao',    className: 'bg-purple-100 text-purple-700 border-purple-200' },
-  DELIVERED:  { label: 'Đã giao',      className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-  CANCELLED:  { label: 'Đã hủy',       className: 'bg-red-100 text-red-700 border-red-200' },
-  REFUNDED:   { label: 'Đã hoàn tiền', className: 'bg-rose-100 text-rose-700 border-rose-200' },
+  PENDING: { label: 'Chờ xác nhận', className: 'bg-amber-100 text-amber-700 border-amber-200' },
+  CONFIRMED: { label: 'Đã xác nhận', className: 'bg-blue-100 text-blue-700 border-blue-200' },
+  PROCESSING: { label: 'Đang xử lý', className: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+  SHIPPED: { label: 'Đang giao', className: 'bg-purple-100 text-purple-700 border-purple-200' },
+  DELIVERED: { label: 'Đã giao', className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+  CANCELLED: { label: 'Đã hủy', className: 'bg-red-100 text-red-700 border-red-200' },
+  REFUNDED: { label: 'Đã hoàn tiền', className: 'bg-rose-100 text-rose-700 border-rose-200' },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<PaymentStatus, { label: string; className: string }> = {
-  UNPAID: { label: 'Chưa TT',   className: 'bg-orange-100 text-orange-600 border-orange-200' },
-  PAID:   { label: 'Đã TT',     className: 'bg-green-100 text-green-700 border-green-200' },
-  FAILED: { label: 'TT lỗi',   className: 'bg-red-100 text-red-600 border-red-200' },
+  UNPAID: { label: 'Chưa TT', className: 'bg-orange-100 text-orange-600 border-orange-200' },
+  PAID: { label: 'Đã TT', className: 'bg-green-100 text-green-700 border-green-200' },
+  FAILED: { label: 'TT lỗi', className: 'bg-red-100 text-red-600 border-red-200' },
 };
 
 // Status transitions: what statuses can each current status transition to
 const NEXT_STATUSES: Partial<Record<OrderStatus, OrderStatus[]>> = {
-  PENDING:    ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED:  ['PROCESSING', 'CANCELLED'],
+  PENDING: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['PROCESSING', 'CANCELLED'],
   PROCESSING: ['SHIPPED', 'CANCELLED'],
-  SHIPPED:    ['DELIVERED'],
+  SHIPPED: ['DELIVERED'],
 };
 
 const FILTER_OPTIONS: { value: string; label: string }[] = [
-  { value: 'ALL',        label: 'Tất cả' },
-  { value: 'PENDING',    label: 'Chờ xác nhận' },
-  { value: 'CONFIRMED',  label: 'Đã xác nhận' },
+  { value: 'ALL', label: 'Tất cả' },
+  { value: 'PENDING', label: 'Chờ xác nhận' },
+  { value: 'CONFIRMED', label: 'Đã xác nhận' },
   { value: 'PROCESSING', label: 'Đang xử lý' },
-  { value: 'SHIPPED',    label: 'Đang giao' },
-  { value: 'DELIVERED',  label: 'Đã giao' },
-  { value: 'CANCELLED',  label: 'Đã hủy' },
+  { value: 'SHIPPED', label: 'Đang giao' },
+  { value: 'DELIVERED', label: 'Đã giao' },
+  { value: 'CANCELLED', label: 'Đã hủy' },
 ];
 
 // ─── Status Dropdown ─────────────────────────────────────────────────────────
@@ -191,7 +191,7 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     load(0);
     return () => { dispatch(clearOrderMessages()); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterStatus]);
 
   const handleStatusUpdate = async (id: number, status: OrderStatus) => {
@@ -203,10 +203,10 @@ export default function AdminOrdersPage() {
   // Client-side search by order code
   const filtered = searchQuery.trim()
     ? orders.filter((o) =>
-        o.orderCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (o.username ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (o.userFullName ?? '').toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      o.orderCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.username ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.userFullName ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : orders;
 
   const totalRevenue = orders
@@ -259,11 +259,10 @@ export default function AdminOrdersPage() {
                 key={opt.value}
                 id={`admin-filter-${opt.value}`}
                 onClick={() => setFilterStatus(opt.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  filterStatus === opt.value
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterStatus === opt.value
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                  }`}
               >
                 {opt.label}
               </button>
@@ -338,11 +337,10 @@ export default function AdminOrdersPage() {
                 key={i}
                 id={`admin-orders-page-${i}`}
                 onClick={() => load(i)}
-                className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
-                  i === currentPage
-                    ? 'bg-primary text-white shadow-md'
-                    : 'bg-white border border-stone-200 text-stone-600 hover:border-primary hover:text-primary'
-                }`}
+                className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${i === currentPage
+                  ? 'bg-primary text-white shadow-md'
+                  : 'bg-white border border-stone-200 text-stone-600 hover:border-primary hover:text-primary'
+                  }`}
               >
                 {i + 1}
               </button>

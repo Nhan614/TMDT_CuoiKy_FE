@@ -43,9 +43,7 @@ export default function ProfilePage() {
   const [appQuote, setAppQuote] = useState("");
   const [appStartedCraftingDate, setAppStartedCraftingDate] = useState("");
   const [appPortfolioUrl, setAppPortfolioUrl] = useState("");
-  const [appAvatarFile, setAppAvatarFile] = useState<File | null>(null);
   const [appAvatarUrl, setAppAvatarUrl] = useState("");
-  const [appProofFiles, setAppProofFiles] = useState<File[]>([]);
   const [appProofUrls, setAppProofUrls] = useState<string[]>([]);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingProofs, setUploadingProofs] = useState(false);
@@ -98,7 +96,6 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setAppAvatarFile(file);
       setUploadingAvatar(true);
       try {
         const url = await uploadProofImage(file);

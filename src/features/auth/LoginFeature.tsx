@@ -52,7 +52,11 @@ function LoginFeature() {
     const response = await dispatch(loginUser({ ...formData })).unwrap();
 
     if (response.success) {
-      navigate("/");
+      if (response.data.role === "ADMIN") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
     }
   };
 

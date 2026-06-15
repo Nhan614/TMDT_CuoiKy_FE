@@ -17,7 +17,11 @@ export default function useAuth() {
         loginWithGoogle({ idToken })
       ).unwrap();
       if (result.success) {
-        navigate("/home");
+        if (result.data.role === "ADMIN") {
+          navigate("/dashboard");
+        } else {
+          navigate("/home");
+        }
       }
     } catch (error) {
       console.log(error);

@@ -22,6 +22,7 @@ export const authSlice = createSlice({
       state.successMessage = null;
       // Xóa luôn ở localStorage để đồng bộ
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
     },
     clearMessages: (state) => {
       state.error = null;
