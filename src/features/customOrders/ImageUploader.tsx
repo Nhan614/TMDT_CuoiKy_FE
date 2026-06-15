@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { uploadReferenceImage, uploadReferenceImage as uploadThunk } from "./customOrderThunk";
+import { uploadReferenceImage } from "./customOrderThunk";
 import { removeUploadedImageUrl } from "./customOrderSlice";
 
 interface ImageUploaderProps {

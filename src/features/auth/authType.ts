@@ -12,6 +12,8 @@ export interface ApiResponse<T> {
   };
 }
 
+export type UserRole = "ADMIN" | "USER" | "ARTISAN" | "GUEST";
+
 export interface LoginRequestDTO {
   username: string;
   password: string;
@@ -32,6 +34,7 @@ export interface GoogleAuthRequestDTO {
 export interface LoginResponseDTO {
   username: string;
   token: string;
+  role: UserRole;
 }
 
 export interface AuthState {
@@ -39,4 +42,4 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
   successMessage: string | null;
-}
+}

@@ -22,6 +22,7 @@ export const loginUser = createAsyncThunk<
     );
     if (response.data.success && response.data.data?.token) {
       localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("role", response.data.data.role);
     }
     return response.data;
   } catch (error: unknown) {
@@ -69,6 +70,7 @@ export const loginWithGoogle = createAsyncThunk<
     );
     if (response.data.success && response.data.data?.token) {
       localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("role", response.data.data.role);
     }
     return response.data;
   } catch (error: unknown) {

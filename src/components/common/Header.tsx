@@ -1,4 +1,5 @@
 import {
+  LayoutDashboard,
   LogOut,
   Menu,
   Package,
@@ -24,6 +25,7 @@ function Header() {
 
   // Kiểm tra đăng nhập: Có user trong Store HOẶC có token trong LocalStorage
   const isLoggedIn = !!user || !!localStorage.getItem("token");
+  const isAdmin = user?.role === "ADMIN" || localStorage.getItem("role") === "ADMIN";
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -89,6 +91,17 @@ function Header() {
           </div>
 
           <div className="flex items-center gap-4">
+            {isAdmin && (
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-full hover:bg-stone-950 transition-colors shadow-sm uppercase tracking-wider cursor-pointer"
+                title="Vào Trang Quản Trị"
+              >
+                <LayoutDashboard size={14} />
+                <span>Admin</span>
+              </Link>
+            )}
+
             <Link
               to="/cart"
               className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
@@ -141,6 +154,16 @@ function Header() {
           animate={{ opacity: 1, y: 0 }}
           className="lg:hidden bg-white border-b border-gray-100 p-4 space-y-4"
         >
+          {isAdmin && (
+            <Link
+              to="/dashboard"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-2 text-primary font-bold py-2 border-b border-stone-100 hover:text-stone-900 transition-colors"
+            >
+              <LayoutDashboard size={18} />
+              Trang Quản Trị (Admin)
+            </Link>
+          )}
           <a href="#" className="block text-stone-600 font-medium py-2">
             Cửa Hàng
           </a>
