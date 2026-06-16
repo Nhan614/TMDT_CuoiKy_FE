@@ -7,6 +7,7 @@ import orderReducer from "../features/orders/orderSlice";
 import commentReducer from "../features/comment/commentSlice";
 import customOrderReducer from "../features/customOrders/customOrderSlice";
 import userReducer from "../features/user/userSlice";
+import artisanApplicationReducer from "../features/artisanApplications/artisanApplicationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     comments: commentReducer,
     customOrders: customOrderReducer,
     user: userReducer,
+    artisanApplications: artisanApplicationReducer,
   },
 });
 

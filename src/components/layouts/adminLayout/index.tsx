@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   LayoutDashboard,
   ShoppingBag,
+  FileText,
   LogOut,
   X,
   Home,
@@ -38,6 +39,11 @@ function AdminLayout() {
       name: "Quản Lý Đơn Hàng",
       icon: ShoppingBag,
     },
+    {
+      path: "/admin/applications",
+      name: "Đăng Ký Nghệ Nhân",
+      icon: FileText,
+    },
   ];
 
   const SidebarContent = () => (
@@ -71,8 +77,8 @@ function AdminLayout() {
               to={item.path}
               onClick={() => setIsSidebarOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive
-                  ? "bg-primary text-white shadow-lg shadow-primary/10"
-                  : "hover:bg-stone-900 text-stone-400 hover:text-stone-100"
+                ? "bg-primary text-white shadow-lg shadow-primary/10"
+                : "hover:bg-stone-900 text-stone-400 hover:text-stone-100"
                 }`}
             >
               <Icon size={18} className={isActive ? "text-white" : "text-stone-500 group-hover:text-stone-300"} />
