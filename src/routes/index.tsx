@@ -15,7 +15,9 @@ import PaymentResultPage from "../pages/public/PaymentResultPage";
 import OrdersPage from "../pages/public/OrdersPage";
 import OrderDetailPage from "../pages/public/OrderDetailPage";
 import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
+import AdminApplicationsPage from "../pages/admin/AdminApplicationsPage";
 import ProfilePage from "../pages/public/ProfilePage";
+import MyApplicationPage from "../pages/public/MyApplicationPage";
 import CustomOrderFormPage from "../pages/public/CustomOrderFormPage";
 import MyCustomOrdersPage from "../pages/public/MyCustomOrdersPage";
 import MyCustomOrderDetailPage from "../pages/public/MyCustomOrderDetailPage";
@@ -95,6 +97,7 @@ export const router = createBrowserRouter([
           { path: "/orders", element: <OrdersPage /> },
           { path: "/orders/:id", element: <OrderDetailPage /> },
           { path: "/profile", element: <ProfilePage /> },
+          { path: "/my-application", element: <MyApplicationPage /> },
         ],
       },
       // User only routes
@@ -126,6 +129,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "/dashboard", element: <DashboardPage /> },
           { path: "/admin/orders", element: <AdminOrdersPage /> },
+          { path: "/admin/applications", element: <AdminApplicationsPage /> },
         ],
       },
     ],

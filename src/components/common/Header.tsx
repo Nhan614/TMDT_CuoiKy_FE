@@ -69,24 +69,24 @@ function Header() {
             >
               Sản phẩm
             </Link>
-            <a href="#" className="hover:text-stone-900 transition-colors">
-              Bộ Sưu Tập
-            </a>
             <Link
               to="/about"
               className="hover:text-stone-900 transition-colors"
             >
               Về chúng tôi
             </Link>
-            <a
-              href="/artisan"
+            <Link
+              to="/artisan"
               className="hover:text-stone-900 transition-colors"
             >
               Đặt hàng riêng
-            </a>
-            <a href="#" className="hover:text-stone-900 transition-colors">
-              Liên Hệ
-            </a>
+            </Link>
+            <Link
+              to="/my-application"
+              className="hover:text-stone-900 transition-colors"
+            >
+              Đăng ký làm thợ
+            </Link>
 
           </div>
 
@@ -116,13 +116,22 @@ function Header() {
             </Link>
 
             {isLoggedIn && (
-              <Link
-                to="/orders"
-                className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
-                title="Đơn hàng"
-              >
-                <Package size={20} />
-              </Link>
+              <>
+                <Link
+                  to="/orders"
+                  className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+                  title="Đơn hàng"
+                >
+                  <Package size={20} />
+                </Link>
+                <Link
+                  to="/profile"
+                  className="hidden sm:block p-2 text-gray-600 hover:text-stone-900 transition-colors"
+                  title="Hồ sơ"
+                >
+                  <User size={20} />
+                </Link>
+              </>
             )}
 
             {/* Xử lý hiển thị User hoặc Logout dựa trên trạng thái đăng nhập */}

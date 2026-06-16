@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   User,
   Mail,
@@ -20,6 +20,7 @@ import { clearUserMessages } from "../../features/user/userSlice";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { currentUser, isLoading, applicationLoading } = useAppSelector(
     (state) => state.user
   );
@@ -172,6 +173,8 @@ export default function ProfilePage() {
       setAppPortfolioUrl("");
       setAppAvatarUrl("");
       setAppProofUrls([]);
+      // Navigate to application status page
+      navigate("/my-application");
     }
   };
 
@@ -227,6 +230,15 @@ export default function ProfilePage() {
                 >
                   <Award size={16} className="text-primary" />
                   Yêu cầu gia công nhận được
+                </Link>
+              )}
+              {currentUser?.role === "USER" && (
+                <Link
+                  to="/my-application"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-stone-50 text-stone-600 text-sm font-semibold transition-all"
+                >
+                  <FileText size={16} className="text-stone-400" />
+                  Đơn đăng ký nghệ nhân
                 </Link>
               )}
             </div>
