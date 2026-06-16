@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Star, ArrowRight, Sparkles, PenTool, Clock, CheckCircle2, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from "motion/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import type { RootState, AppDispatch } from '../../app/store';
-import { fetchArtisans, setSkill, setSortBy, setCurrentPage, type Artisan, createArtisanOrder } from '../../features/artisans/artisansSlice';
+import { fetchArtisans, setSkill, setSortBy, setCurrentPage, type Artisan } from '../../features/artisans/artisansSlice';
 
 const benefits = [
   { icon: <Sparkles className="w-6 h-6" />, title: 'Chất liệu tuyển chọn', description: 'Tùy chọn loại sợi và màu sắc theo sở thích cá nhân.' },
@@ -16,18 +16,15 @@ const benefits = [
 interface ArtisanCardProps {
   artisan: Artisan;
   index: number;
-  onOrder: (id: number) => Promise<void>;
+  onOrder: (id: number) => void;
 }
 
 function ArtisanCard({ artisan, index, onOrder }: ArtisanCardProps) {
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleOrder = async (e: React.MouseEvent) => {
+  const handleOrder = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLoading(true);
-    await onOrder(artisan.id);
-    setLoading(false);
+    onOrder(artisan.id);
   };
 
   return (
@@ -73,17 +70,10 @@ function ArtisanCard({ artisan, index, onOrder }: ArtisanCardProps) {
         </div>
         <button 
           onClick={handleOrder}
-          disabled={loading}
-          className="mt-auto w-full group/btn relative flex items-center justify-center gap-2 bg-primary text-white font-bold py-4 rounded-button overflow-hidden transition-all hover:bg-primary/90 disabled:bg-primary/50"
+          className="mt-auto w-full group/btn relative flex items-center justify-center gap-2 bg-primary text-white font-bold py-4 rounded-button overflow-hidden transition-all hover:bg-primary/90"
         >
-          {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <>
-              <span className="z-10">Chọn nghệ nhân này</span>
-              <ArrowRight className="w-5 h-5 z-10 transition-transform group-hover/btn:translate-x-1" />
-            </>
-          )}
+          <span className="z-10">Chọn nghệ nhân này</span>
+          <ArrowRight className="w-5 h-5 z-10 transition-transform group-hover/btn:translate-x-1" />
         </button>
       </div>
     </motion.div>
@@ -92,6 +82,7 @@ function ArtisanCard({ artisan, index, onOrder }: ArtisanCardProps) {
 
 export default function ArtisanPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   
   const { pageData, loading, selectedSkill, sortBy, currentPage } = useSelector(
     (state: RootState) => state.artisans
@@ -116,13 +107,8 @@ export default function ArtisanPage() {
     dispatch(fetchArtisans());
   }, [dispatch, selectedSkill, sortBy, currentPage]);
 
-  const handleCreateOrder = async (id: number) => {
-    const result = await dispatch(createArtisanOrder(id));
-    if (createArtisanOrder.fulfilled.match(result)) {
-      alert(`🎉 Thành công: ${result.payload}`);
-    } else {
-      alert(`⚠️ Thất bại: ${result.payload}`);
-    }
+  const handleCreateOrder = (id: number) => {
+    navigate(`/custom-orders/create?artisanId=${id}`);
   };
 
   return (

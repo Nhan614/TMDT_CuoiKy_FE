@@ -7,12 +7,12 @@ const API_BASE_URL = 'http://localhost:8080/api/artisans';
 export interface Artisan {
   id: number;
   name: string;
-  tag: string;      
+  tag: string;
   image: string;
   rating: number;
   quote: string;
   experience: string;
-  orders: string;      
+  orders: string;
   featured?: boolean;
 }
 
@@ -38,7 +38,7 @@ export interface ArtisanReview {
   customerAvatar: string;
   rating: number;
   comment: string;
-  createdAt: string; 
+  createdAt: string;
 }
 
 export interface ArtisanProfile {
@@ -81,7 +81,7 @@ interface ArtisanState {
   currentPage: number; // Lưu ý: React chạy từ trang 0
   error: string | null;
   currentProfile: ArtisanProfile | null;
-  profileLoading: boolean;               
+  profileLoading: boolean;
 }
 
 // ==================== INITIAL STATE ====================
@@ -112,12 +112,12 @@ export const fetchArtisans = createAsyncThunk(
     try {
       const { artisans } = getState() as { artisans: ArtisanState };
       const queryParams = new URLSearchParams();
-      
+
       if (artisans.selectedSkill !== 'ALL') {
         queryParams.append('skill', artisans.selectedSkill);
       }
       queryParams.append('sortBy', artisans.sortBy);
-      
+
       // 🌟 LƯU Ý CHÍNH: Spring Boot nhận trang từ 0, nếu meta cũ trả về từ 1 thì ta giữ nguyên gửi số trang hiện tại
       queryParams.append('page', artisans.currentPage.toString());
       queryParams.append('size', artisans.pageData.size.toString());
@@ -128,7 +128,7 @@ export const fetchArtisans = createAsyncThunk(
       }
 
       const result = (await response.json()) as ApiResponse<Artisan[]>;
-      
+
       // 🌟 TÁI CẤU TRÚC: Chuyển đổi dữ liệu tự chế từ BE thành PageResponse chuẩn cho FE
       const formattedPageData: PageResponse = {
         content: Array.isArray(result.data) ? result.data : [],
@@ -138,7 +138,7 @@ export const fetchArtisans = createAsyncThunk(
         size: result.meta?.size || artisans.pageData.size
       };
 
-      return formattedPageData; 
+      return formattedPageData;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Lỗi kết nối API');
     }
@@ -155,27 +155,7 @@ export const fetchArtisanProfile = createAsyncThunk(
         throw new Error('Không thể tải thông tin nghệ nhân');
       }
       const result = (await response.json()) as ApiResponse<ArtisanProfile>;
-      return result.data; 
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Lỗi kết nối API');
-    }
-  }
-);
-
-// 3. Thunk tạo đơn hàng mới với nghệ nhân
-export const createArtisanOrder = createAsyncThunk(
-  'artisans/createOrder',
-  async (id: number, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/${id}/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const message = await response.text();
-      if (!response.ok) {
-        throw new Error(message || 'Không thể tạo đơn hàng');
-      }
-      return message;
+      return result.data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Lỗi kết nối API');
     }
@@ -190,11 +170,11 @@ const artisanSlice = createSlice({
   reducers: {
     setSkill: (state, action: PayloadAction<string>) => {
       state.selectedSkill = action.payload;
-      state.currentPage = 0; 
+      state.currentPage = 0;
     },
     setSortBy: (state, action: PayloadAction<string>) => {
       state.sortBy = action.payload;
-      state.currentPage = 0; 
+      state.currentPage = 0;
     },
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload;
@@ -220,7 +200,7 @@ const artisanSlice = createSlice({
         state.error = action.payload as string;
         state.pageData = initialState.pageData;
       })
-      
+
       // Xử lý Thunk fetchArtisanProfile (Chi tiết Hồ sơ)
       .addCase(fetchArtisanProfile.pending, (state) => {
         state.profileLoading = true;

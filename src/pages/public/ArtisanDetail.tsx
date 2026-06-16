@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Star, Loader2, ChevronLeft, Calendar, PackageCheck, Briefcase } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../../app/store';
-import { fetchArtisanProfile, createArtisanOrder } from '../../features/artisans/artisansSlice';
+import { fetchArtisanProfile } from '../../features/artisans/artisansSlice';
 
 export default function ArtisanDetail() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
-  const [orderLoading, setOrderLoading] = useState(false);
+  const navigate = useNavigate();
 
   const { currentProfile, profileLoading } = useSelector(
     (state: RootState) => state.artisans
@@ -18,16 +18,8 @@ export default function ArtisanDetail() {
     if (id) dispatch(fetchArtisanProfile(Number(id)));
   }, [dispatch, id]);
 
-  const handleCreateOrder = async (id: number) => {
-    setOrderLoading(true);
-    const result = await dispatch(createArtisanOrder(id));
-    setOrderLoading(false);
-    
-    if (createArtisanOrder.fulfilled.match(result)) {
-      alert(`🎉 Thành công: ${result.payload}`);
-    } else {
-      alert(`⚠️ Thất bại: ${result.payload}`);
-    }
+  const handleCreateOrder = (id: number) => {
+    navigate(`/custom-orders/create?artisanId=${id}`);
   };
 
   // Hàm định dạng ngày tháng an toàn, không lo crash giao diện
@@ -69,10 +61,10 @@ export default function ArtisanDetail() {
         {/* CỘT TRÁI: Thẻ thông tin nghệ nhân */}
         <div className="lg:col-span-4">
           <div className="sticky top-32 bg-surface rounded-3xl border border-black/5 overflow-hidden shadow-sm">
-            <img 
-              src={currentProfile.image} 
-              alt={currentProfile.name} 
-              className="w-full aspect-square object-cover" 
+            <img
+              src={currentProfile.image}
+              alt={currentProfile.name}
+              className="w-full aspect-square object-cover"
               referrerPolicy="no-referrer"
             />
             <div className="p-8">
@@ -84,7 +76,7 @@ export default function ArtisanDetail() {
                 </div>
               </div>
               <p className="text-secondary italic mb-8">"{currentProfile.quote || 'Tâm huyết đặt vào từng đường kim mũi chỉ'}"</p>
-              
+
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3 text-sm">
                   <Briefcase className="w-5 h-5 text-primary" />
@@ -100,12 +92,11 @@ export default function ArtisanDetail() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => handleCreateOrder(currentProfile.id)}
-                disabled={orderLoading}
-                className="w-full bg-primary text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20"
+                className="w-full bg-primary text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20"
               >
-                {orderLoading ? <Loader2 className="animate-spin w-5 h-5" /> : "Đặt hàng riêng ngay"}
+                Đặt hàng riêng ngay
               </button>
             </div>
           </div>
@@ -123,10 +114,10 @@ export default function ArtisanDetail() {
                 {productsList.map(product => (
                   <div key={product.id} className="group cursor-pointer">
                     <div className="aspect-square rounded-2xl overflow-hidden bg-stone-100 mb-2">
-                      <img 
-                        src={product.image} 
+                      <img
+                        src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
                       />
                     </div>
@@ -145,7 +136,7 @@ export default function ArtisanDetail() {
               Kỹ năng chính: <span className="text-primary font-bold uppercase tracking-wider">{currentProfile.skillValue || 'Đang cập nhật'}</span>
             </p>
             <p className="text-secondary mt-4 leading-relaxed">
-              Nghệ nhân {currentProfile.name} nổi tiếng với phong cách {currentProfile.tag ? currentProfile.tag.toLowerCase() : 'nghệ nhân'} tinh tế. 
+              Nghệ nhân {currentProfile.name} nổi tiếng với phong cách {currentProfile.tag ? currentProfile.tag.toLowerCase() : 'nghệ nhân'} tinh tế.
               Each product reflects personal dedication and meticulous attention to every single detail.
             </p>
           </section>
@@ -161,9 +152,9 @@ export default function ArtisanDetail() {
                   <div key={review.id} className="border-b border-black/5 pb-6">
                     <div className="flex items-center gap-4 mb-3">
                       {review.customerAvatar ? (
-                        <img 
-                          src={review.customerAvatar} 
-                          alt={review.customerName} 
+                        <img
+                          src={review.customerAvatar}
+                          alt={review.customerName}
                           className="w-10 h-10 rounded-full object-cover"
                           referrerPolicy="no-referrer"
                         />
@@ -176,9 +167,9 @@ export default function ArtisanDetail() {
                         <p className="text-sm font-bold text-[#1b1c1c]">{review.customerName || 'Khách hàng ẩn danh'}</p>
                         <div className="flex text-primary">
                           {[...Array(5)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              className={`w-3 h-3 ${i < (review.rating || 5) ? 'fill-primary text-primary' : 'text-stone-300'}`} 
+                            <Star
+                              key={i}
+                              className={`w-3 h-3 ${i < (review.rating || 5) ? 'fill-primary text-primary' : 'text-stone-300'}`}
                             />
                           ))}
                         </div>
