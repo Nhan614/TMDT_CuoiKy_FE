@@ -183,12 +183,12 @@ function LoginFeature() {
                     Ghi nhớ đăng nhập
                   </span>
                 </button>
-                <a
-                  href="#"
+                <Link
+                  to="/forgot-password"
                   className="text-slate-900 font-semibold hover:text-purple-600 transition-colors"
                 >
                   Quên mật khẩu?
-                </a>
+                </Link>
               </div>
 
               {/* Nút Login */}
