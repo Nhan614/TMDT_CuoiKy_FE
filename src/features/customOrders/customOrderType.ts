@@ -3,7 +3,11 @@ export type CustomOrderStatus =
   | 'ACCEPTED'
   | 'REJECTED'
   | 'CANCELLED'
+  | 'PAYMENT_PENDING'
+  | 'IN_PROGRESS'
   | 'COMPLETED';
+
+export type CustomOrderPaymentStatus = 'UNPAID' | 'PAID' | 'FAILED';
 
 export interface CustomOrderDTO {
   id: number;
@@ -20,6 +24,9 @@ export interface CustomOrderDTO {
   status: CustomOrderStatus;
   artisanNote: string | null;
   quotedPrice: number | null;
+  paymentStatus: CustomOrderPaymentStatus | null;
+  paymentTransactionId: string | null;
+  paymentAt: string | null;
   referenceImageUrls: string[];
   createdAt: string;
   updatedAt: string;
@@ -58,6 +65,7 @@ export interface CustomOrderState {
   successMessage: string | null;
   uploadedImageUrls: string[];
   isUploading: boolean;
+  paymentUrl: string | null;
   // Pagination
   totalPages: number;
   totalElements: number;

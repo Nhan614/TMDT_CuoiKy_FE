@@ -10,6 +10,7 @@ import {
   Clock,
   Calendar,
   CircleDollarSign,
+  CreditCard,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchMyCustomOrders, cancelMyCustomOrder } from "../../features/customOrders/customOrderThunk";
@@ -26,10 +27,12 @@ const formatDate = (dateStr: string) => {
 
 const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: string }> = {
   PENDING: { label: "Chờ xử lý", className: "bg-amber-100 text-amber-700 border-amber-200" },
-  ACCEPTED: { label: "Đã chấp nhận", className: "bg-green-100 text-green-700 border-green-200" },
+  ACCEPTED: { label: "Chờ thanh toán", className: "bg-green-100 text-green-700 border-green-200" },
   REJECTED: { label: "Đã từ chối", className: "bg-red-100 text-red-700 border-red-200" },
   CANCELLED: { label: "Đã hủy", className: "bg-stone-100 text-stone-600 border-stone-200" },
-  COMPLETED: { label: "Hoàn thành", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  PAYMENT_PENDING: { label: "Đang xử lý TT", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  IN_PROGRESS: { label: "Đang thực hiện", className: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+  COMPLETED: { label: "Hoàn thành", className: "bg-teal-100 text-teal-700 border-teal-200" },
 };
 
 function StatusBadge({ status }: { status: CustomOrderStatus }) {
@@ -48,7 +51,7 @@ interface OrderCardProps {
 }
 
 function OrderCard({ order, onCancel, cancelling }: OrderCardProps) {
-  const canCancel = order.status === "PENDING";
+  const canCancel = order.status === "PENDING" || order.status === "ACCEPTED";
 
   return (
     <motion.div
@@ -97,10 +100,22 @@ function OrderCard({ order, onCancel, cancelling }: OrderCardProps) {
           </div>
         </div>
 
-        {order.quotedPrice && (
+        {order.quotedPrice && order.status !== "PAYMENT_PENDING" && order.status !== "IN_PROGRESS" && order.status !== "COMPLETED" && (
           <div className="mt-3 p-3 bg-green-50/50 border border-green-100 rounded-xl flex items-center justify-between text-xs">
             <span className="text-green-700 font-medium">Báo giá của nghệ nhân:</span>
             <strong className="text-green-700 text-sm font-bold">{formatCurrency(order.quotedPrice)}</strong>
+          </div>
+        )}
+        {order.status === "ACCEPTED" && order.quotedPrice && (
+          <div className="mt-3 p-3 bg-primary/5 border border-primary/10 rounded-xl flex items-center justify-between text-xs">
+            <span className="text-primary font-medium flex items-center gap-1"><CreditCard size={12} /> Báo giá - Cần thanh toán:</span>
+            <strong className="text-primary text-sm font-bold">{formatCurrency(order.quotedPrice)}</strong>
+          </div>
+        )}
+        {(order.status === "IN_PROGRESS" || order.status === "COMPLETED") && order.quotedPrice && (
+          <div className="mt-3 p-3 bg-teal-50/50 border border-teal-100 rounded-xl flex items-center justify-between text-xs">
+            <span className="text-teal-700 font-medium">Đã thanh toán:</span>
+            <strong className="text-teal-700 text-sm font-bold">{formatCurrency(order.quotedPrice)}</strong>
           </div>
         )}
       </div>
@@ -167,10 +182,11 @@ export default function MyCustomOrdersPage() {
   const tabs: { label: string; value: CustomOrderStatus | "ALL" }[] = [
     { label: "Tất cả", value: "ALL" },
     { label: "Chờ xử lý", value: "PENDING" },
-    { label: "Đã chấp nhận", value: "ACCEPTED" },
+    { label: "Chờ thanh toán", value: "ACCEPTED" },
+    { label: "Đang thực hiện", value: "IN_PROGRESS" },
+    { label: "Hoàn thành", value: "COMPLETED" },
     { label: "Đã từ chối", value: "REJECTED" },
     { label: "Đã hủy", value: "CANCELLED" },
-    { label: "Hoàn thành", value: "COMPLETED" },
   ];
 
   return (

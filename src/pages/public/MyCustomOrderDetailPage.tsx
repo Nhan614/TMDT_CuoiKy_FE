@@ -10,10 +10,20 @@ import {
   CheckCircle,
   AlertTriangle,
   FileImage,
+  CreditCard,
+  Hourglass,
+  Hammer,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchMyCustomOrderById, cancelMyCustomOrder } from "../../features/customOrders/customOrderThunk";
-import { clearCustomOrderMessages } from "../../features/customOrders/customOrderSlice";
+import {
+  fetchMyCustomOrderById,
+  cancelMyCustomOrder,
+  confirmAndPay,
+} from "../../features/customOrders/customOrderThunk";
+import {
+  clearCustomOrderMessages,
+  clearPaymentUrl,
+} from "../../features/customOrders/customOrderSlice";
 import type { CustomOrderStatus } from "../../features/customOrders/customOrderType";
 
 const formatCurrency = (n: number) => n.toLocaleString("vi-VN") + "₫";
@@ -24,6 +34,14 @@ const formatDate = (dateStr: string) => {
   return isNaN(date.getTime()) ? "Chưa cập nhật" : date.toLocaleDateString("vi-VN");
 };
 
+const formatDateTime = (dateStr: string) => {
+  if (!dateStr) return "Chưa cập nhật";
+  const date = new Date(dateStr);
+  return isNaN(date.getTime())
+    ? "Chưa cập nhật"
+    : date.toLocaleString("vi-VN", { dateStyle: "short", timeStyle: "short" });
+};
+
 const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: string; icon: React.ReactNode }> = {
   PENDING: {
     label: "Chờ xử lý",
@@ -31,7 +49,7 @@ const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: strin
     icon: <Clock className="w-4 h-4 text-amber-500" />,
   },
   ACCEPTED: {
-    label: "Đã chấp nhận",
+    label: "Đã chấp nhận - Chờ thanh toán",
     className: "bg-green-100 text-green-700 border-green-200",
     icon: <CheckCircle className="w-4 h-4 text-green-500" />,
   },
@@ -45,10 +63,20 @@ const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: strin
     className: "bg-stone-100 text-stone-600 border-stone-200",
     icon: <Trash2 className="w-4 h-4 text-stone-500" />,
   },
+  PAYMENT_PENDING: {
+    label: "Đang xử lý thanh toán",
+    className: "bg-blue-100 text-blue-700 border-blue-200",
+    icon: <Hourglass className="w-4 h-4 text-blue-500" />,
+  },
+  IN_PROGRESS: {
+    label: "Đang thực hiện",
+    className: "bg-indigo-100 text-indigo-700 border-indigo-200",
+    icon: <Hammer className="w-4 h-4 text-indigo-500" />,
+  },
   COMPLETED: {
     label: "Hoàn thành",
-    className: "bg-blue-100 text-blue-700 border-blue-200",
-    icon: <CheckCircle className="w-4 h-4 text-blue-500" />,
+    className: "bg-teal-100 text-teal-700 border-teal-200",
+    icon: <CheckCircle className="w-4 h-4 text-teal-500" />,
   },
 };
 
@@ -57,7 +85,7 @@ export default function MyCustomOrderDetailPage() {
   const orderId = Number(id);
   const dispatch = useAppDispatch();
 
-  const { myCurrentOrder, isLoading, error } = useAppSelector(
+  const { myCurrentOrder, isLoading, isSubmitting, error, paymentUrl } = useAppSelector(
     (state) => state.customOrders
   );
 
@@ -69,8 +97,16 @@ export default function MyCustomOrderDetailPage() {
     }
     return () => {
       dispatch(clearCustomOrderMessages());
+      dispatch(clearPaymentUrl());
     };
   }, [dispatch, orderId]);
+
+  // Redirect to VNPay when paymentUrl is ready
+  useEffect(() => {
+    if (paymentUrl) {
+      window.location.href = paymentUrl;
+    }
+  }, [paymentUrl]);
 
   useEffect(() => {
     if (myCurrentOrder?.referenceImageUrls && myCurrentOrder.referenceImageUrls.length > 0) {
@@ -84,6 +120,16 @@ export default function MyCustomOrderDetailPage() {
     if (cancelMyCustomOrder.fulfilled.match(result)) {
       alert("Hủy yêu cầu thành công!");
     }
+  };
+
+  const handleConfirmPayment = async () => {
+    if (
+      !window.confirm(
+        "Bạn xác nhận báo giá từ nghệ nhân và tiến hành thanh toán qua VNPay?"
+      )
+    )
+      return;
+    dispatch(confirmAndPay(orderId));
   };
 
   if (isLoading && !myCurrentOrder) {
@@ -105,6 +151,9 @@ export default function MyCustomOrderDetailPage() {
   }
 
   const statusCfg = STATUS_CONFIG[myCurrentOrder.status];
+  const canCancel =
+    myCurrentOrder.status === "PENDING" || myCurrentOrder.status === "ACCEPTED";
+  const canPay = myCurrentOrder.status === "ACCEPTED" && myCurrentOrder.quotedPrice;
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-stone-50/55">
@@ -182,7 +231,7 @@ export default function MyCustomOrderDetailPage() {
                     Phản hồi từ Nghệ nhân
                   </h3>
 
-                  {myCurrentOrder.status === "ACCEPTED" && myCurrentOrder.quotedPrice && (
+                  {myCurrentOrder.quotedPrice && (
                     <div className="flex items-center justify-between py-2 border-b border-primary/5">
                       <span className="text-xs text-stone-500 font-medium">Báo giá của nghệ nhân:</span>
                       <strong className="text-primary text-base font-bold">{formatCurrency(myCurrentOrder.quotedPrice)}</strong>
@@ -199,6 +248,30 @@ export default function MyCustomOrderDetailPage() {
                       </p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Payment Info (when paid) */}
+              {myCurrentOrder.paymentStatus === "PAID" && myCurrentOrder.paymentAt && (
+                <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl space-y-2">
+                  <h3 className="text-sm font-bold text-teal-700 flex items-center gap-1.5">
+                    <CreditCard size={15} />
+                    Thông tin thanh toán
+                  </h3>
+                  <div className="flex items-center justify-between text-xs text-teal-700">
+                    <span>Trạng thái:</span>
+                    <span className="font-bold">Đã thanh toán ✓</span>
+                  </div>
+                  {myCurrentOrder.paymentTransactionId && (
+                    <div className="flex items-center justify-between text-xs text-teal-700">
+                      <span>Mã giao dịch:</span>
+                      <span className="font-mono font-bold">{myCurrentOrder.paymentTransactionId}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-teal-700">
+                    <span>Thời gian thanh toán:</span>
+                    <span className="font-bold">{formatDateTime(myCurrentOrder.paymentAt)}</span>
+                  </div>
                 </div>
               )}
 
@@ -236,7 +309,7 @@ export default function MyCustomOrderDetailPage() {
             </div>
           </div>
 
-          {/* Right Column: Artisan Details & Cancellation */}
+          {/* Right Column: Artisan Details & Actions */}
           <div className="lg:col-span-4 space-y-6">
 
             {/* Artisan Summary Card */}
@@ -261,8 +334,32 @@ export default function MyCustomOrderDetailPage() {
               </div>
             </div>
 
-            {/* Actions Card */}
-            {myCurrentOrder.status === "PENDING" && (
+            {/* Pay Action Card — only when ACCEPTED and has quotedPrice */}
+            {canPay && (
+              <div className="bg-white rounded-3xl border border-green-100 shadow-sm p-6 space-y-4">
+                <h4 className="text-sm font-bold text-stone-700">Xác nhận & Thanh toán</h4>
+                <p className="text-xs text-stone-500 leading-relaxed">
+                  Nghệ nhân đã báo giá{" "}
+                  <strong className="text-primary">{formatCurrency(myCurrentOrder.quotedPrice!)}</strong>.
+                  Nhấn xác nhận để thanh toán qua VNPay và bắt đầu sản xuất.
+                </p>
+                <button
+                  onClick={handleConfirmPayment}
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-primary/20 text-sm cursor-pointer disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <CreditCard size={16} />
+                  )}
+                  Thanh toán ngay
+                </button>
+              </div>
+            )}
+
+            {/* Cancel Action Card */}
+            {canCancel && (
               <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 space-y-4">
                 <h4 className="text-sm font-bold text-stone-700">Hành động của bạn</h4>
                 <button
@@ -273,7 +370,9 @@ export default function MyCustomOrderDetailPage() {
                   Hủy yêu cầu này
                 </button>
                 <p className="text-[11px] text-stone-400 text-center leading-relaxed">
-                  Bạn có thể hủy yêu cầu gia công này bất cứ lúc nào trước khi nghệ nhân chấp nhận xử lý.
+                  {myCurrentOrder.status === "PENDING"
+                    ? "Bạn có thể hủy yêu cầu bất cứ lúc nào trước khi nghệ nhân chấp nhận."
+                    : "Bạn có thể hủy khi chưa thanh toán (đơn sẽ về trạng thái Đã hủy)."}
                 </p>
               </div>
             )}

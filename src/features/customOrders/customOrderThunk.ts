@@ -111,6 +111,22 @@ export const cancelMyCustomOrder = createAsyncThunk<
   }
 });
 
+// Confirm and Pay (User xác nhận báo giá → lấy link VNPay)
+export const confirmAndPay = createAsyncThunk<
+  ApiResponse<{ paymentUrl: string }>,
+  number,
+  { rejectValue: string }
+>("customOrders/confirmAndPay", async (id, { rejectWithValue }) => {
+  try {
+    const response = await axiosClient.post<ApiResponse<{ paymentUrl: string }>>(
+      `/custom-orders/my/${id}/confirm-payment`
+    );
+    return response.data;
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, "Không thể tạo link thanh toán!"));
+  }
+});
+
 // Fetch Artisan Custom Orders (for Artisan)
 export const fetchArtisanCustomOrders = createAsyncThunk<
   ApiResponse<CustomOrderDTO[]>,
@@ -180,5 +196,21 @@ export const rejectCustomOrder = createAsyncThunk<
     return response.data;
   } catch (error: unknown) {
     return rejectWithValue(getErrorMessage(error, "Không thể từ chối yêu cầu gia công!"));
+  }
+});
+
+// Complete Custom Order (Artisan đánh dấu hoàn thành)
+export const completeCustomOrder = createAsyncThunk<
+  ApiResponse<CustomOrderDTO>,
+  number,
+  { rejectValue: string }
+>("customOrders/completeCustomOrder", async (id, { rejectWithValue }) => {
+  try {
+    const response = await axiosClient.patch<ApiResponse<CustomOrderDTO>>(
+      `/custom-orders/artisan/${id}/complete`
+    );
+    return response.data;
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, "Không thể đánh dấu hoàn thành đơn gia công!"));
   }
 });
