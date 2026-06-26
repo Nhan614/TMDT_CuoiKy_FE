@@ -6,10 +6,12 @@ import {
   fetchMyCustomOrders,
   fetchMyCustomOrderById,
   cancelMyCustomOrder,
+  confirmAndPay,
   fetchArtisanCustomOrders,
   fetchArtisanCustomOrderById,
   acceptCustomOrder,
   rejectCustomOrder,
+  completeCustomOrder,
 } from "./customOrderThunk";
 
 const initialState: CustomOrderState = {
@@ -23,6 +25,7 @@ const initialState: CustomOrderState = {
   successMessage: null,
   uploadedImageUrls: [],
   isUploading: false,
+  paymentUrl: null,
   totalPages: 0,
   totalElements: 0,
   currentPage: 0,
@@ -45,6 +48,9 @@ export const customOrderSlice = createSlice({
     clearCurrentOrders: (state) => {
       state.myCurrentOrder = null;
       state.artisanCurrentOrder = null;
+    },
+    clearPaymentUrl: (state) => {
+      state.paymentUrl = null;
     },
   },
   extraReducers: (builder) => {
@@ -147,6 +153,25 @@ export const customOrderSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // --- CONFIRM AND PAY ---
+      .addCase(confirmAndPay.pending, (state) => {
+        state.isSubmitting = true;
+        state.error = null;
+        state.paymentUrl = null;
+      })
+      .addCase(confirmAndPay.fulfilled, (state, action) => {
+        state.isSubmitting = false;
+        if (action.payload.success && action.payload.data?.paymentUrl) {
+          state.paymentUrl = action.payload.data.paymentUrl;
+        } else {
+          state.error = action.payload.message || "Không thể tạo link thanh toán!";
+        }
+      })
+      .addCase(confirmAndPay.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      })
+
       // --- FETCH ARTISAN CUSTOM ORDERS ---
       .addCase(fetchArtisanCustomOrders.pending, (state) => {
         state.isLoading = true;
@@ -233,6 +258,30 @@ export const customOrderSlice = createSlice({
       .addCase(rejectCustomOrder.rejected, (state, action) => {
         state.isSubmitting = false;
         state.error = action.payload as string;
+      })
+
+      // --- COMPLETE CUSTOM ORDER ---
+      .addCase(completeCustomOrder.pending, (state) => {
+        state.isSubmitting = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(completeCustomOrder.fulfilled, (state, action) => {
+        state.isSubmitting = false;
+        if (action.payload.success) {
+          state.artisanCurrentOrder = action.payload.data;
+          const idx = state.artisanOrders.findIndex((o) => o.id === action.payload.data.id);
+          if (idx !== -1) {
+            state.artisanOrders[idx] = action.payload.data;
+          }
+          state.successMessage = action.payload.message || "Đơn gia công đã được đánh dấu hoàn thành!";
+        } else {
+          state.error = action.payload.message;
+        }
+      })
+      .addCase(completeCustomOrder.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
       });
   },
 });
@@ -242,6 +291,7 @@ export const {
   clearUploadedImageUrls,
   removeUploadedImageUrl,
   clearCurrentOrders,
+  clearPaymentUrl,
 } = customOrderSlice.actions;
 
 export default customOrderSlice.reducer;

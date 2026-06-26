@@ -10,6 +10,8 @@ import {
   X,
   FileImage,
   ShieldAlert,
+  Hammer,
+  CreditCard,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchMyProfile } from "../../features/user/userThunk";
@@ -17,6 +19,7 @@ import {
   fetchArtisanCustomOrderById,
   acceptCustomOrder,
   rejectCustomOrder,
+  completeCustomOrder,
 } from "../../features/customOrders/customOrderThunk";
 import { clearCustomOrderMessages } from "../../features/customOrders/customOrderSlice";
 import type { CustomOrderStatus } from "../../features/customOrders/customOrderType";
@@ -31,10 +34,12 @@ const formatDate = (dateStr: string) => {
 
 const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: string }> = {
   PENDING: { label: "Chờ phản hồi", className: "bg-amber-100 text-amber-700 border-amber-200" },
-  ACCEPTED: { label: "Đã chấp nhận", className: "bg-green-100 text-green-700 border-green-200" },
+  ACCEPTED: { label: "Đã chấp nhận - Chờ TT", className: "bg-green-100 text-green-700 border-green-200" },
   REJECTED: { label: "Đã từ chối", className: "bg-red-100 text-red-700 border-red-200" },
   CANCELLED: { label: "Đã hủy", className: "bg-stone-100 text-stone-600 border-stone-200" },
-  COMPLETED: { label: "Hoàn thành", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  PAYMENT_PENDING: { label: "Đang xử lý thanh toán", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  IN_PROGRESS: { label: "Đang thực hiện", className: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+  COMPLETED: { label: "Hoàn thành", className: "bg-teal-100 text-teal-700 border-teal-200" },
 };
 
 export default function ArtisanCustomOrderDetailPage() {
@@ -87,7 +92,7 @@ export default function ArtisanCustomOrderDetailPage() {
       })
     );
     if (acceptCustomOrder.fulfilled.match(result)) {
-      alert("Bạn đã chấp nhận yêu cầu gia công này!");
+      alert("Bạn đã chấp nhận yêu cầu gia công này! Khách hàng sẽ tiến hành thanh toán.");
     }
   };
 
@@ -106,6 +111,14 @@ export default function ArtisanCustomOrderDetailPage() {
     if (rejectCustomOrder.fulfilled.match(result)) {
       setShowRejectModal(false);
       alert("Bạn đã từ chối yêu cầu gia công này.");
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!window.confirm("Đánh dấu đơn gia công này đã hoàn thành?")) return;
+    const result = await dispatch(completeCustomOrder(orderId));
+    if (completeCustomOrder.fulfilled.match(result)) {
+      alert("Đơn gia công đã được đánh dấu hoàn thành!");
     }
   };
 
@@ -145,6 +158,7 @@ export default function ArtisanCustomOrderDetailPage() {
 
   const statusCfg = STATUS_CONFIG[artisanCurrentOrder.status];
   const isPending = artisanCurrentOrder.status === "PENDING";
+  const isInProgress = artisanCurrentOrder.status === "IN_PROGRESS";
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-stone-50/55">
@@ -326,6 +340,37 @@ export default function ArtisanCustomOrderDetailPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+            )}
+
+            {/* ─── Complete Order Panel (only when IN_PROGRESS) ─── */}
+            {isInProgress && (
+              <div className="bg-white rounded-3xl border border-indigo-100 shadow-sm p-6 sm:p-8 space-y-4">
+                <h2 className="text-lg font-bold text-stone-800 border-b border-stone-100 pb-4 flex items-center gap-2">
+                  <Hammer size={18} className="text-indigo-500" />
+                  Đánh dấu hoàn thành
+                </h2>
+                <p className="text-sm text-stone-500">
+                  Khi bạn đã sản xuất xong và giao hàng cho khách, hãy đánh dấu đơn này là hoàn thành.
+                </p>
+                {artisanCurrentOrder.quotedPrice && (
+                  <div className="p-3 bg-teal-50 border border-teal-100 rounded-xl flex items-center justify-between text-sm">
+                    <span className="text-teal-700 font-medium flex items-center gap-1.5"><CreditCard size={14} /> Đã nhận thanh toán:</span>
+                    <strong className="text-teal-700">{formatCurrency(artisanCurrentOrder.quotedPrice)}</strong>
+                  </div>
+                )}
+                <button
+                  onClick={handleComplete}
+                  disabled={isSubmitting}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-200 text-sm cursor-pointer disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin w-4 h-4" />
+                  ) : (
+                    <CheckCircle size={16} />
+                  )}
+                  Xác nhận đã hoàn thành
+                </button>
               </div>
             )}
 
