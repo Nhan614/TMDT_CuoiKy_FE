@@ -12,6 +12,7 @@ import {
   acceptCustomOrder,
   rejectCustomOrder,
   completeCustomOrder,
+  confirmReceived,
 } from "./customOrderThunk";
 
 const initialState: CustomOrderState = {
@@ -280,6 +281,29 @@ export const customOrderSlice = createSlice({
         }
       })
       .addCase(completeCustomOrder.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      })
+      // --- CONFIRM RECEIVED ---
+      .addCase(confirmReceived.pending, (state) => {
+        state.isSubmitting = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(confirmReceived.fulfilled, (state, action) => {
+        state.isSubmitting = false;
+        if (action.payload.success) {
+          state.myCurrentOrder = action.payload.data;
+          const idx = state.myOrders.findIndex((o) => o.id === action.payload.data.id);
+          if (idx !== -1) {
+            state.myOrders[idx] = action.payload.data;
+          }
+          state.successMessage = action.payload.message || "Xác nhận đã nhận hàng thành công!";
+        } else {
+          state.error = action.payload.message;
+        }
+      })
+      .addCase(confirmReceived.rejected, (state, action) => {
         state.isSubmitting = false;
         state.error = action.payload as string;
       });

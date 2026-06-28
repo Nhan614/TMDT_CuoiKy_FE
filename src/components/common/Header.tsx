@@ -1,4 +1,5 @@
 import {
+  CreditCard,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -283,6 +284,16 @@ function UserMenu({
                 >
                   <Spool size={16} />
                   Đơn gia công riêng
+                </Link>
+              )}
+              {role === "ARTISAN" && (
+                <Link
+                  to="/wallet"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                >
+                  <CreditCard size={16} />
+                  Ví tiền & Rút tiền
                 </Link>
               )}
 

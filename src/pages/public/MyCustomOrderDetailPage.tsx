@@ -19,6 +19,7 @@ import {
   fetchMyCustomOrderById,
   cancelMyCustomOrder,
   confirmAndPay,
+  confirmReceived,
 } from "../../features/customOrders/customOrderThunk";
 import {
   clearCustomOrderMessages,
@@ -72,6 +73,11 @@ const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: strin
     label: "Đang thực hiện",
     className: "bg-indigo-100 text-indigo-700 border-indigo-200",
     icon: <Hammer className="w-4 h-4 text-indigo-500" />,
+  },
+  DELIVERED: {
+    label: "Đã bàn giao - Chờ nhận",
+    className: "bg-purple-100 text-purple-700 border-purple-200",
+    icon: <CheckCircle className="w-4 h-4 text-purple-500" />,
   },
   COMPLETED: {
     label: "Hoàn thành",
@@ -132,6 +138,19 @@ export default function MyCustomOrderDetailPage() {
     dispatch(confirmAndPay(orderId));
   };
 
+  const handleConfirmReceived = async () => {
+    if (
+      !window.confirm(
+        "Bạn xác nhận đã nhận hàng gia công thành công? Tiền sẽ được chuyển cho thợ thủ công."
+      )
+    )
+      return;
+    const result = await dispatch(confirmReceived(orderId));
+    if (confirmReceived.fulfilled.match(result)) {
+      alert("Xác nhận đã nhận hàng thành công!");
+    }
+  };
+
   if (isLoading && !myCurrentOrder) {
     return (
       <div className="flex justify-center items-center py-40 flex-col gap-3">
@@ -154,6 +173,7 @@ export default function MyCustomOrderDetailPage() {
   const canCancel =
     myCurrentOrder.status === "PENDING" || myCurrentOrder.status === "ACCEPTED";
   const canPay = myCurrentOrder.status === "ACCEPTED" && myCurrentOrder.quotedPrice;
+  const canConfirmReceived = myCurrentOrder.status === "DELIVERED";
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-stone-50/55">
@@ -354,6 +374,28 @@ export default function MyCustomOrderDetailPage() {
                     <CreditCard size={16} />
                   )}
                   Thanh toán ngay
+                </button>
+              </div>
+            )}
+
+            {/* Confirm Received Action Card */}
+            {canConfirmReceived && (
+              <div className="bg-white rounded-3xl border border-purple-100 shadow-sm p-6 space-y-4">
+                <h4 className="text-sm font-bold text-stone-700">Xác nhận nhận hàng</h4>
+                <p className="text-xs text-stone-500 leading-relaxed">
+                  Nghệ nhân đã hoàn thành và bàn giao sản phẩm. Nhấn xác nhận nếu bạn đã nhận đúng và đủ sản phẩm gia công.
+                </p>
+                <button
+                  onClick={handleConfirmReceived}
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-primary/20 text-sm cursor-pointer disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <CheckCircle size={16} />
+                  )}
+                  Đã nhận được hàng
                 </button>
               </div>
             )}

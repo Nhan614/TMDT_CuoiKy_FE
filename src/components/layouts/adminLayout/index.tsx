@@ -10,6 +10,7 @@ import {
   Home,
   Shield,
   ChevronRight,
+  CreditCard,
 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import { logout } from "../../../features/auth/authSlice";
@@ -43,6 +44,11 @@ function AdminLayout() {
       path: "/admin/applications",
       name: "Đăng Ký Nghệ Nhân",
       icon: FileText,
+    },
+    {
+      path: "/admin/withdrawals",
+      name: "Duyệt Rút Tiền",
+      icon: CreditCard,
     },
   ];
 

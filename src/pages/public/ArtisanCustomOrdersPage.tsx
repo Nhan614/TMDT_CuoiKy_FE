@@ -32,6 +32,7 @@ const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: strin
   CANCELLED: { label: "Đã hủy", className: "bg-stone-100 text-stone-600 border-stone-200" },
   PAYMENT_PENDING: { label: "Đang xử lý TT", className: "bg-blue-100 text-blue-700 border-blue-200" },
   IN_PROGRESS: { label: "Đang thực hiện", className: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+  DELIVERED: { label: "Đã bàn giao", className: "bg-purple-100 text-purple-700 border-purple-200" },
   COMPLETED: { label: "Hoàn thành", className: "bg-teal-100 text-teal-700 border-teal-200" },
 };
 
@@ -151,6 +152,7 @@ export default function ArtisanCustomOrdersPage() {
     { label: "Chờ phản hồi", value: "PENDING" },
     { label: "Chờ thanh toán", value: "ACCEPTED" },
     { label: "Đang thực hiện", value: "IN_PROGRESS" },
+    { label: "Đã bàn giao", value: "DELIVERED" },
     { label: "Hoàn thành", value: "COMPLETED" },
     { label: "Đã từ chối", value: "REJECTED" },
     { label: "Đã hủy", value: "CANCELLED" },

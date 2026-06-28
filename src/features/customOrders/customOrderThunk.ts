@@ -214,3 +214,19 @@ export const completeCustomOrder = createAsyncThunk<
     return rejectWithValue(getErrorMessage(error, "Không thể đánh dấu hoàn thành đơn gia công!"));
   }
 });
+
+// Confirm Received (Khách hàng xác nhận đã nhận hàng)
+export const confirmReceived = createAsyncThunk<
+  ApiResponse<CustomOrderDTO>,
+  number,
+  { rejectValue: string }
+>("customOrders/confirmReceived", async (id, { rejectWithValue }) => {
+  try {
+    const response = await axiosClient.patch<ApiResponse<CustomOrderDTO>>(
+      `/custom-orders/my/${id}/confirm-received`
+    );
+    return response.data;
+  } catch (error: unknown) {
+    return rejectWithValue(getErrorMessage(error, "Không thể xác nhận đã nhận hàng!"));
+  }
+});

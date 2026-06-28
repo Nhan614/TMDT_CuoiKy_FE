@@ -8,6 +8,7 @@ import commentReducer from "../features/comment/commentSlice";
 import customOrderReducer from "../features/customOrders/customOrderSlice";
 import userReducer from "../features/user/userSlice";
 import artisanApplicationReducer from "../features/artisanApplications/artisanApplicationSlice";
+import walletReducer from "../features/wallet/walletSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     customOrders: customOrderReducer,
     user: userReducer,
     artisanApplications: artisanApplicationReducer,
+    wallet: walletReducer,
   },
 });
 
