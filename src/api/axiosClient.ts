@@ -33,7 +33,7 @@ axiosClient.interceptors.response.use(
     const { response } = error;
 
     // catching 401 (Unauthorized) cause token has expired
-    if (response && response.status === 403) {
+    if (response && (response.status === 401 || response.status === 403)) {
       localStorage.removeItem("token");
       window.location.href = "/login";
     }

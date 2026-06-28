@@ -39,6 +39,7 @@ const STATUS_CONFIG: Record<CustomOrderStatus, { label: string; className: strin
   CANCELLED: { label: "Đã hủy", className: "bg-stone-100 text-stone-600 border-stone-200" },
   PAYMENT_PENDING: { label: "Đang xử lý thanh toán", className: "bg-blue-100 text-blue-700 border-blue-200" },
   IN_PROGRESS: { label: "Đang thực hiện", className: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+  DELIVERED: { label: "Đã giao hàng - Chờ khách nhận", className: "bg-purple-100 text-purple-700 border-purple-200" },
   COMPLETED: { label: "Hoàn thành", className: "bg-teal-100 text-teal-700 border-teal-200" },
 };
 
@@ -115,10 +116,10 @@ export default function ArtisanCustomOrderDetailPage() {
   };
 
   const handleComplete = async () => {
-    if (!window.confirm("Đánh dấu đơn gia công này đã hoàn thành?")) return;
+    if (!window.confirm("Đánh dấu đơn gia công này đã hoàn thành & giao hàng?")) return;
     const result = await dispatch(completeCustomOrder(orderId));
     if (completeCustomOrder.fulfilled.match(result)) {
-      alert("Đơn gia công đã được đánh dấu hoàn thành!");
+      alert("Đơn gia công đã được đánh dấu bàn giao thành công!");
     }
   };
 
@@ -348,14 +349,14 @@ export default function ArtisanCustomOrderDetailPage() {
               <div className="bg-white rounded-3xl border border-indigo-100 shadow-sm p-6 sm:p-8 space-y-4">
                 <h2 className="text-lg font-bold text-stone-800 border-b border-stone-100 pb-4 flex items-center gap-2">
                   <Hammer size={18} className="text-indigo-500" />
-                  Đánh dấu hoàn thành
+                  Giao hàng & Hoàn thành
                 </h2>
                 <p className="text-sm text-stone-500">
-                  Khi bạn đã sản xuất xong và giao hàng cho khách, hãy đánh dấu đơn này là hoàn thành.
+                  Khi bạn đã hoàn thành sản phẩm và bàn giao/gửi hàng cho khách, hãy đánh dấu đơn này đã được giao. Tiền sẽ được cộng vào số dư của bạn khi khách hàng bấm xác nhận đã nhận hàng.
                 </p>
                 {artisanCurrentOrder.quotedPrice && (
                   <div className="p-3 bg-teal-50 border border-teal-100 rounded-xl flex items-center justify-between text-sm">
-                    <span className="text-teal-700 font-medium flex items-center gap-1.5"><CreditCard size={14} /> Đã nhận thanh toán:</span>
+                    <span className="text-teal-700 font-medium flex items-center gap-1.5"><CreditCard size={14} /> Đã thanh toán (tạm giữ):</span>
                     <strong className="text-teal-700">{formatCurrency(artisanCurrentOrder.quotedPrice)}</strong>
                   </div>
                 )}
@@ -369,8 +370,27 @@ export default function ArtisanCustomOrderDetailPage() {
                   ) : (
                     <CheckCircle size={16} />
                   )}
-                  Xác nhận đã hoàn thành
+                  Xác nhận đã giao hàng
                 </button>
+              </div>
+            )}
+
+            {/* ─── Delivered Wait Panel (only when DELIVERED) ─── */}
+            {artisanCurrentOrder.status === "DELIVERED" && (
+              <div className="bg-white rounded-3xl border border-purple-100 shadow-sm p-6 sm:p-8 space-y-4">
+                <h2 className="text-lg font-bold text-stone-800 border-b border-stone-100 pb-4 flex items-center gap-2">
+                  <Clock size={18} className="text-purple-500" />
+                  Đang chờ xác nhận
+                </h2>
+                <p className="text-sm text-stone-500">
+                  Bạn đã đánh dấu bàn giao sản phẩm này. Đang chờ khách hàng xác nhận đã nhận hàng để cộng số dư tài khoản của bạn.
+                </p>
+                {artisanCurrentOrder.quotedPrice && (
+                  <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-between text-sm">
+                    <span className="text-purple-700 font-medium flex items-center gap-1.5"><CreditCard size={14} /> Số tiền sẽ nhận:</span>
+                    <strong className="text-purple-700">{formatCurrency(artisanCurrentOrder.quotedPrice)}</strong>
+                  </div>
+                )}
               </div>
             )}
 

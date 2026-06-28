@@ -24,6 +24,8 @@ import MyCustomOrderDetailPage from "../pages/public/MyCustomOrderDetailPage";
 import ArtisanCustomOrdersPage from "../pages/public/ArtisanCustomOrdersPage";
 import ArtisanCustomOrderDetailPage from "../pages/public/ArtisanCustomOrderDetailPage";
 import UnauthorizedPage from "../pages/public/UnauthorizedPage";
+import ArtisanWalletPage from "../pages/public/ArtisanWalletPage";
+import AdminWithdrawalsPage from "../pages/admin/AdminWithdrawalsPage";
 
 export const router = createBrowserRouter([
   {
@@ -125,6 +127,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "/custom-orders/artisan", element: <ArtisanCustomOrdersPage /> },
           { path: "/custom-orders/artisan/:id", element: <ArtisanCustomOrderDetailPage /> },
+          { path: "/wallet", element: <ArtisanWalletPage /> },
         ],
       },
     ],
@@ -140,6 +143,7 @@ export const router = createBrowserRouter([
           { path: "/dashboard", element: <DashboardPage /> },
           { path: "/admin/orders", element: <AdminOrdersPage /> },
           { path: "/admin/applications", element: <AdminApplicationsPage /> },
+          { path: "/admin/withdrawals", element: <AdminWithdrawalsPage /> },
         ],
       },
     ],

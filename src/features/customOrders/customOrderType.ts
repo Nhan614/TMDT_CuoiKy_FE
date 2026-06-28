@@ -5,6 +5,7 @@ export type CustomOrderStatus =
   | 'CANCELLED'
   | 'PAYMENT_PENDING'
   | 'IN_PROGRESS'
+  | 'DELIVERED'
   | 'COMPLETED';
 
 export type CustomOrderPaymentStatus = 'UNPAID' | 'PAID' | 'FAILED';
