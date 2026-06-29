@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { HomePage, LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from "../pages/public";
-import { DashboardPage } from "../pages/admin";
+import { DashboardPage, AdminProductsPage } from "../pages/admin";
 import PublicLayout from "../components/layouts/publicLayout";
 import AdminLayout from "../components/layouts/adminLayout";
 import AboutPage from "../pages/public/AboutPage";
@@ -26,6 +26,7 @@ import ArtisanCustomOrderDetailPage from "../pages/public/ArtisanCustomOrderDeta
 import UnauthorizedPage from "../pages/public/UnauthorizedPage";
 import ArtisanWalletPage from "../pages/public/ArtisanWalletPage";
 import AdminWithdrawalsPage from "../pages/admin/AdminWithdrawalsPage";
+import ArtisanProductManagePage from "../pages/public/ArtisanProductManagePage";
 
 export const router = createBrowserRouter([
   {
@@ -128,6 +129,7 @@ export const router = createBrowserRouter([
           { path: "/custom-orders/artisan", element: <ArtisanCustomOrdersPage /> },
           { path: "/custom-orders/artisan/:id", element: <ArtisanCustomOrderDetailPage /> },
           { path: "/wallet", element: <ArtisanWalletPage /> },
+          { path: "/artisan/products", element: <ArtisanProductManagePage /> },
         ],
       },
     ],
@@ -144,6 +146,7 @@ export const router = createBrowserRouter([
           { path: "/admin/orders", element: <AdminOrdersPage /> },
           { path: "/admin/applications", element: <AdminApplicationsPage /> },
           { path: "/admin/withdrawals", element: <AdminWithdrawalsPage /> },
+          { path: "/admin/products", element: <AdminProductsPage /> },
         ],
       },
     ],
