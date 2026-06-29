@@ -296,6 +296,16 @@ function UserMenu({
                   Ví tiền & Rút tiền
                 </Link>
               )}
+              {role === "ARTISAN" && (
+                <Link
+                  to="/artisan/products"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                >
+                  <Package size={16} />
+                  Quản Lý Sản Phẩm
+                </Link>
+              )}
 
               {/* Đăng xuất */}
               <button

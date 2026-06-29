@@ -11,6 +11,7 @@ import {
   Shield,
   ChevronRight,
   CreditCard,
+  Tag,
 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import { logout } from "../../../features/auth/authSlice";
@@ -49,6 +50,11 @@ function AdminLayout() {
       path: "/admin/withdrawals",
       name: "Duyệt Rút Tiền",
       icon: CreditCard,
+    },
+    {
+      path: "/admin/products",
+      name: "Quản Lý Sản Phẩm",
+      icon: Tag,
     },
   ];
 
