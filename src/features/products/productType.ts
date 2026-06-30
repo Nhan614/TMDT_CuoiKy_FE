@@ -1,3 +1,5 @@
+export type ProductStatus = "ACTIVE" | "HIDDEN" | "DELETED";
+
 export interface ProductResponseDTO {
   id: number;
   name?: string;
@@ -7,6 +9,8 @@ export interface ProductResponseDTO {
   rating?: number;
   image?: string;
   thumbnailUrl?: string;
+  imageUrl?: string; // Đồng bộ ảnh chính
+  cloudinaryPublicId?: string;
   images?: string[];
   materials?: string[];
   averageRating?: number;
@@ -14,9 +18,11 @@ export interface ProductResponseDTO {
   isPreOrder?: boolean;
   makingDays?: number;
   artisanName?: string;
+  artisanId?: number;
   categoryName?: string;
   categoryId?: number;
   isActive?: boolean;
+  status?: ProductStatus;
   description?: string;
   shortDescription?: string;
 }
