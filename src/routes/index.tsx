@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { HomePage, LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from "../pages/public";
-import { DashboardPage } from "../pages/admin";
+import DashboardPage from '../pages/admin/dashboard/DashboardPage';
 import PublicLayout from "../components/layouts/publicLayout";
 import AdminLayout from "../components/layouts/adminLayout";
 import AboutPage from "../pages/public/AboutPage";
